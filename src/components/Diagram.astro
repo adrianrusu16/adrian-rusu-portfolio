@@ -1,0 +1,25 @@
+---
+interface Props {
+  name: string;
+  alt: string;
+  caption?: string;
+}
+const { name, alt, caption } = Astro.props;
+---
+
+<figure
+  class="system-diagram"
+  tabindex="0"
+  aria-label="Architecture diagram; scroll horizontally on narrow screens"
+>
+  <img
+    src={`/images/diagrams/${name}.svg`}
+    alt={alt}
+    loading="lazy"
+    fetchpriority="low"
+    decoding="async"
+    width="960"
+    height={name === 'pandawave' ? 840 : 560}
+  />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

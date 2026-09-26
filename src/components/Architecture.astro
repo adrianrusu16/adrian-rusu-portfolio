@@ -1,0 +1,138 @@
+---
+interface Props {
+  compact?: boolean;
+  kind?: string;
+}
+const { compact = false, kind = 'flagship' } = Astro.props;
+---
+
+<div
+  class:list={['architecture', { 'architecture-compact': compact }]}
+  aria-label={kind === 'backend'
+    ? 'Canopy backend architecture'
+    : kind === 'contract'
+      ? 'Canopy API contract architecture'
+      : 'PandaWave architecture'}
+>
+  <div class="diagram-heading">
+    <span>SYSTEM OVERVIEW</span><span class="diagram-version"
+      >{kind === 'contract' ? 'canopy.v1' : 'ARCHITECTURE'}</span
+    >
+  </div>
+  {
+    kind === 'contract' ? (
+      <>
+        <>
+          <div class="architecture-node blue">
+            <>
+              <span class="node-kicker">SHARED CONTRACT</span>
+              <strong>canopy-api</strong>
+              <small>Protobuf · Buf · Versioning</small>
+            </>
+          </div>
+          <div class="connector">
+            <span>generated interfaces</span>
+          </div>
+          <div class="node-pair">
+            <>
+              <div class="architecture-node">
+                <>
+                  <strong>PandaEngine</strong>
+                  <small>Client</small>
+                </>
+              </div>
+              <div class="architecture-node">
+                <>
+                  <strong>Canopy</strong>
+                  <small>Server</small>
+                </>
+              </div>
+            </>
+          </div>
+        </>
+      </>
+    ) : kind === 'backend' ? (
+      <>
+        <>
+          <div class="architecture-node blue">
+            <>
+              <span class="node-kicker">CLIENT</span>
+              <strong>PandaEngine</strong>
+              <small>Rust domain engine</small>
+            </>
+          </div>
+          <div class="connector">
+            <span>gRPC</span>
+          </div>
+          <div class="architecture-node burgundy">
+            <>
+              <span class="node-kicker">BACKEND</span>
+              <strong>Canopy</strong>
+              <small>Identity · Search · Playback authorization</small>
+            </>
+          </div>
+          <div class="connector">
+            <span>storage & media delivery</span>
+          </div>
+          <div class="node-pair">
+            <>
+              <div class="architecture-node">
+                <>
+                  <strong>PostgreSQL</strong>
+                  <small>Data & search</small>
+                </>
+              </div>
+              <div class="architecture-node">
+                <>
+                  <strong>Nginx</strong>
+                  <small>Media delivery</small>
+                </>
+              </div>
+            </>
+          </div>
+        </>
+      </>
+    ) : (
+      <>
+        <>
+          <div class="architecture-node blue">
+            <>
+              <span class="node-kicker">ANDROID / AAOS</span>
+              <strong>
+                Compose HMI <span class="node-divider">→</span> MediaEngineService
+              </strong>
+              <small>Kotlin · Media3 · Binder / AIDL</small>
+            </>
+          </div>
+          <div class="connector">
+            <span>JNI / FFI</span>
+          </div>
+          <div class="architecture-node burgundy">
+            <>
+              <span class="node-kicker">RUST DOMAIN ENGINE</span>
+              <strong>PandaEngine</strong>
+              <small>Queue · Auth · State · Playback policy</small>
+            </>
+          </div>
+          <div class="connector">
+            <span>gRPC</span>
+          </div>
+          <div class="architecture-node">
+            <>
+              <span class="node-kicker">BACKEND</span>
+              <strong>Canopy</strong>
+              <small>Rust · PostgreSQL · Nginx</small>
+            </>
+          </div>
+        </>
+      </>
+    )
+  }
+  <div class="diagram-footnote">
+    {
+      kind === 'contract'
+        ? 'One contract. Two implementations.'
+        : 'Explicit boundaries. Clear ownership.'
+    }
+  </div>
+</div>

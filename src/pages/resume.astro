@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import { identity } from '../data/identity';
+---
+
+<BaseLayout
+  title="Résumé — Adrian Rusu"
+  description="Adrian Rusu’s Android / AAOS résumé, including production automotive experience, engineering projects and systems learning."
+>
+  <section class="page-intro">
+    <div class="container">
+      <span class="eyebrow">RÉSUMÉ</span><h1>Adrian Rusu<span class="title-dot">.</span></h1><p
+        class="intro-description"
+      >
+        Senior Android / AAOS Engineer<br />Automotive media · Performance · Systems
+      </p><div class="resume-actions">
+        <a class="button button-light" href={identity.resume} download
+          >Download résumé PDF <Icon name="download" /></a
+        ><a
+          class="button button-outline"
+          href={identity.resume}
+          target="_blank"
+          rel="noopener noreferrer">Open résumé <Icon name="arrow" /></a
+        >
+      </div><p class="print-note">Two-page résumé · Cluj-Napoca, Romania</p>
+    </div>
+  </section>
+  <section class="section container resume-content">
+    <div class="resume-section">
+      <h2>Current role</h2><div>
+        <h3>AscentCore / SiriusXM</h3><p>Aug 2023 — Present · Senior Android Developer</p><p>
+          Production automotive media HMI, Android media integration, automotive interaction,
+          performance investigation and feature ownership.
+        </p>
+      </div>
+    </div><div class="resume-section">
+      <h2>Earlier experience</h2><div>
+        <h3>Endava</h3><p>
+          Nov 2021 — Jun 2023 · Android Developer<br />Oct 2021 — Nov 2021 · Android Developer
+          Intern
+        </p><p>
+          Java/Kotlin Android development, POS hardware integration and an internal Android
+          Automotive project.
+        </p>
+      </div>
+    </div><div class="resume-section">
+      <h2>Engineering work</h2><div>
+        <p>PandaWave · Canopy · canopy-api · C++ Mastery</p><a class="text-link" href="/projects/"
+          >Explore the case studies <Icon name="arrow" size={18} /></a
+        >
+      </div>
+    </div><div class="resume-section"><h2>Connect</h2><ContactStrip /></div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,9 @@
+{
+  "name": "Adrian Rusu — Engineering Portfolio",
+  "short_name": "Adrian Rusu",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

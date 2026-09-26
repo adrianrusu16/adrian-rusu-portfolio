@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Portrait from '../components/Portrait.astro';
+import SourceLink from '../components/SourceLink.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="hero-art" aria-hidden="true"></div><div class="hero-shade"></div><div
+      class="container hero-inner"
+    >
+      <div class="hero-copy">
+        <div class="eyebrow hero-eyebrow">
+          <span class="tiny-line"></span>SENIOR ANDROID / AAOS ENGINEER
+        </div><h1>Building media<br />experiences<br /><span>for cars.</span></h1><p>
+          At the intersection of automotive media,<br class="desktop-break" /> Android performance, and
+          systems engineering.
+        </p><div class="hero-actions">
+          <a class="button button-primary" href="/projects/"
+            >Explore my work <Icon name="right" /></a
+          ><a class="text-link" href="/about/">A little about me <Icon name="arrow" size={18} /></a>
+        </div>
+        <a class="human-anchor" href="/about/"
+          ><Portrait small /><span
+            ><strong>Adrian Rusu</strong><small>Senior Android / AAOS Engineer</small></span
+          ></a
+        >
+      </div><div class="hero-caption">
+        <span>ANDROID AUTOMOTIVE</span><span>Thoughtful interfaces. Deliberate architecture.</span>
+      </div>
+    </div><div class="hero-bottom container">
+      <div class="tech-line">
+        <span>AAOS</span><i>·</i><span>Kotlin</span><i>·</i><span>Android Media</span><i>·</i><span
+          >Performance</span
+        ><i>·</i><span>Rust</span><i>·</i><span>C++</span>
+      </div><a href="#selected-work" class="scroll-link">SCROLL TO EXPLORE <span>↓</span></a>
+    </div>
+  </section>
+  <section class="section container work-section" id="selected-work">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">01 / SELECTED WORK</span><h2>
+          Built to understand.<br /><span class="muted">Designed to go deeper.</span>
+        </h2>
+      </div><a href="/projects/" class="text-link">All projects <Icon name="arrow" size={18} /></a>
+    </div><article class="flagship-card">
+      <div class="flagship-copy">
+        <span class="pill"><span></span>FLAGSHIP PROJECT</span><h3>
+          PandaWave<span class="title-dot">.</span>
+        </h3><p class="large-description">
+          An AAOS media platform built to explore what lives underneath the screen.
+        </p><p>
+          Kotlin and Media3 own the Android experience. Binder/AIDL and JNI cross into PandaEngine,
+          a Rust runtime that owns client state and domain decisions. Canopy provides the gRPC
+          backend, PostgreSQL persistence and authorized media delivery.
+        </p><div class="tags">
+          <span>AAOS</span><span>Kotlin</span><span>Media3</span><span>AIDL</span><span>Rust</span>
+        </div><a class="button button-light" href="/projects/pandawave/"
+          >Explore the case study <Icon name="arrow" /></a
+        >
+        <SourceLink href="https://github.com/adrianrusu16/Media-App" label="GitHub" />
+      </div><a class="flagship-visual" href="/projects/pandawave/" aria-label="Explore PandaWave"
+        ><span class="eyebrow">PANDAWAVE / RUNNING ON AAOS</span><img
+          src="/images/pandawave/home.webp"
+          srcset="/images/pandawave/home-small.webp 700w, /images/pandawave/home.webp 1408w"
+          sizes="(max-width: 780px) 90vw, 50vw"
+          alt="PandaWave recommendations and media playback on Android Automotive"
+          width="1408"
+          height="792"
+          loading="lazy"
+          fetchpriority="low"
+          decoding="async"
+        /><span class="visual-caption">A real interface. An explicit system underneath. ↗</span></a
+      >
+    </article><div class="project-grid">
+      {
+        projects
+          .filter((p) => p.id !== 'pandawave')
+          .map((p) => <ProjectCard id={p.id} {...p.data} />)
+      }
+    </div>
+  </section>
+  <section class="section expertise-section">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">02 / ENGINEERING FOCUS</span><h2>
+            The experience is on screen.<br /><span class="muted">The thinking goes deeper.</span>
+          </h2>
+        </div>
+      </div><div class="focus-grid">
+        <article>
+          <span class="focus-icon"><Icon name="media" size={25} /></span><h3>Automotive media</h3><p
+          >
+            Production AAOS and HMI work across playback, sessions, audio focus and interaction
+            patterns designed for the car.
+          </p><span class="focus-details">AAOS · MediaSession · HMI</span>
+        </article><article>
+          <span class="focus-icon"><Icon name="pulse" size={25} /></span><h3>
+            Performance engineering
+          </h3><p>
+            Following the evidence from a slow start or missed frame to the thread, allocation,
+            boundary or state transition behind it.
+          </p><span class="focus-details">Perfetto · ATrace · Runtime diagnostics</span>
+        </article><article>
+          <span class="focus-icon"><Icon name="layers" size={25} /></span><h3>
+            Systems exploration
+          </h3><p>
+            Moving closer to the platform through process boundaries, native domain logic, AOSP
+            exploration and modern C++.
+          </p><span class="focus-details">Binder / AIDL · Rust · AOSP · C++</span>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="section container experience-teaser">
+    <div>
+      <span class="eyebrow">03 / IN PRODUCTION</span><h2>
+        Personal curiosity.<br />Production perspective.
+      </h2><p>
+        My professional work in automotive media informs the questions I explore in my personal
+        projects.
+      </p><a class="text-link" href="/experience/"
+        >Explore my experience <Icon name="arrow" size={18} /></a
+      >
+    </div><div class="experience-preview">
+      <span class="eyebrow">ASCENTCORE / SIRIUSXM</span><p class="career-date">
+        Aug 2023 — Present
+      </p><h3>
+        Senior Android /<br />AAOS Developer
+      </h3><p>Automotive media HMI</p><div class="tags">
+        <span>Media</span><span>Automotive</span><span>Performance</span><span
+          >Feature ownership</span
+        >
+      </div>
+    </div>
+  </section>
+</BaseLayout>

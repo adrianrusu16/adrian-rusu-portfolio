@@ -1,0 +1,52 @@
+{
+  "home": {
+    "src": "/images/pandawave/home.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "now-playing": {
+    "src": "/images/pandawave/now-playing.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "search": {
+    "src": "/images/pandawave/search.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "library": {
+    "src": "/images/pandawave/library.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "profile": {
+    "src": "/images/pandawave/profile.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "aaos": {
+    "src": "/images/pandawave/aaos.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "restrictions": {
+    "src": "/images/pandawave/restrictions.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "focus": {
+    "src": "/images/pandawave/focus.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "overlay": {
+    "src": "/images/pandawave/overlay.webp",
+    "width": 1408,
+    "height": 792
+  },
+  "baseline": {
+    "src": "/images/pandawave/baseline.webp",
+    "width": 1408,
+    "height": 792
+  }
+}

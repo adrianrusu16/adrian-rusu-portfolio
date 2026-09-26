@@ -1,0 +1,20 @@
+---
+interface Props {
+  small?: boolean;
+}
+const { small = false } = Astro.props;
+---
+
+<img
+  class:list={['portrait', { 'portrait-small': small }]}
+  src={`/images/adrian-portrait-${small ? 160 : 800}.webp`}
+  srcset={small
+    ? undefined
+    : '/images/adrian-portrait-480.webp 480w, /images/adrian-portrait-800.webp 800w'}
+  sizes={small ? undefined : '(max-width: 780px) 90vw, 380px'}
+  alt="Adrian Rusu"
+  width={small ? 160 : 800}
+  height={small ? 200 : 1000}
+  loading={small ? 'eager' : 'eager'}
+  decoding="async"
+/>

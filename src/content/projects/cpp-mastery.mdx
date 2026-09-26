@@ -1,0 +1,179 @@
+---
+title: C++ Mastery
+summary: Rebuilding familiar abstractions to make object lifetime, ownership, memory and failure paths visible.
+label: Systems learning lab
+subtitle: Learning the machinery by rebuilding the abstractions.
+intro: C++ Mastery is a hands-on learning repository, not a production standard-library replacement. I use small C and C++ experiments to make lifetime, allocation, generic programming and failure behavior concrete as I move deeper into platform engineering.
+tags: [C++, Memory, Templates, Sanitizers]
+order: 4
+kind: lab
+repository: https://github.com/adrianrusu16/cpp-mastery
+repositoryVisibility: public
+image: /images/diagrams/vector.svg
+imageAlt: Vector growth from capacity four to eight with live objects and unconstructed storage
+socialImage: /images/og-cpp-mastery.png
+seoTitle: C++ Mastery — Lifetime, Containers & Systems Learning | Adrian Rusu
+related: [pandawave, canopy]
+---
+
+import Diagram from '../../components/Diagram.astro';
+import EvidenceCards from '../../components/EvidenceCards.astro';
+import Flow from '../../components/Flow.astro';
+
+## Learning by rebuilding
+
+Using a container is different from implementing its lifetime rules. The lab takes familiar concepts apart: when storage becomes an object, what a move actually transfers, what happens during reallocation and what must remain true when construction throws.
+
+## Object lifetime and ownership
+
+The `Tracer` experiment logs construction, copying, moving, assignment and destruction. Its nested-scope example is deliberately small enough to follow by hand.
+
+```cpp title="cpp/lifetime/main.cpp — exact excerpt"
+    Tracer a{1};
+
+    {
+        Tracer b{2};
+    }
+
+    std::cout << "leaving function\n";
+```
+
+<Diagram
+  name="lifetime"
+  alt="Tracer a is constructed in the function scope. Tracer b is constructed and destroyed inside the nested scope; a is destroyed when the function exits."
+/>
+
+The same source explores copy/move operations and forced `std::vector` reallocation. [Lifetime experiment →](https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/lifetime/main.cpp)
+
+## Vector as the centerpiece
+
+<Diagram
+  name="vector"
+  alt="An example Vector grows from four live objects in capacity four to five live objects in capacity eight. The appended object is constructed before existing objects are relocated; unused capacity remains raw storage."
+  caption="The diagram illustrates the repository’s growth experiment. Allocated capacity and live object count are different quantities."
+/>
+
+<Flow
+  label="Vector growth and lifetime sequence"
+  steps={[
+    { title: 'Allocate raw storage', detail: 'Allocator + capacity' },
+    { title: 'Construct appended value', detail: 'Before aliased source can move' },
+    { title: 'Relocate existing objects', detail: 'std::move_if_noexcept' },
+    { title: 'Destroy old objects', detail: 'End their lifetimes' },
+    { title: 'Deallocate old storage', detail: 'Commit the new allocation' },
+  ]}
+/>
+
+Constructing the appended element first matters for `v.push_back(v[0])`: the argument refers into the vector’s current allocation. Relocating it too early can change or invalidate the very value being appended.
+
+```cpp title="cpp/containers/vector/Vector.h — exact growth-loop excerpt"
+            for (; relocated < size_; ++relocated) {
+                std::construct_at(
+                    new_elements + relocated,
+                    std::move_if_noexcept(
+                        data_[relocated]
+                    )
+                );
+            }
+```
+
+The implementation separates allocation, construction, destruction and deallocation rather than treating them as one operation. [Vector implementation →](https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/containers/vector/Vector.h)
+
+## Exception safety
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Make failure happen on purpose',
+      text: 'ThrowOnCopy counts live objects and throws after a chosen number of copies. The tests check that partially constructed copies are cleaned up.',
+    },
+    {
+      title: 'Preserve the destination',
+      text: 'Copy assignment builds a temporary before swapping. If the copy fails, the original destination remains intact; the test inspects its values and live-object count.',
+    },
+    {
+      title: 'Clean up partial growth',
+      text: 'The growth path tracks relocated objects and whether the appended object exists, then destroys completed constructions and releases the new allocation on failure.',
+    },
+    {
+      title: 'Keep guarantees precise',
+      text: 'move_if_noexcept prefers copying when a throwing move could weaken rollback. A throwing move-only type or self-move has different guarantees; the lab avoids assuming a universal unchanged-state promise.',
+    },
+  ]}
+/>
+
+[Failure, self-copy and self-move experiments →](https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/containers/vector/main.cpp)
+
+## Alignment and layout
+
+```cpp title="cpp/containers/vector/main.cpp — exact excerpt"
+struct alignas(64) CacheLineData {
+    int values[16]{};
+};
+```
+
+<Diagram
+  name="alignment"
+  alt="Three 64-byte-aligned CacheLineData objects with sixteen int slots each. The experiment inspects addresses and stride, without claiming a measured performance gain."
+/>
+
+Printing addresses, offsets and address modulus makes alignment observable. It is a way to reason about layout and locality; this case study makes no cache-speedup or benchmark claim.
+
+## Modern C++ concepts
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Concepts',
+      text: 'Express the operations a template requires and observe how constraints shape overload selection.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/templates/concepts/main.cpp',
+    },
+    {
+      title: 'Template deduction',
+      text: 'Follow which types are deduced and which conversions happen after deduction.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/templates/deduction/main.cpp',
+    },
+    {
+      title: 'Value categories and forwarding',
+      text: 'Trace lvalues, rvalues, references and forwarding through function boundaries.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/value_categories/main.cpp',
+    },
+    {
+      title: 'Fold expressions',
+      text: 'Reduce a parameter pack while making evaluation and operation choice explicit.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/templates/folds/main.cpp',
+    },
+    {
+      title: 'Type deduction',
+      text: 'Compare auto, decltype and reference behavior through runnable examples.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/blob/master/cpp/type_deduction/main.cpp',
+    },
+    {
+      title: 'RAII',
+      text: 'Give resource ownership a lifetime boundary through an IntBuffer implementation.',
+      href: 'https://github.com/adrianrusu16/cpp-mastery/tree/master/cpp/raii',
+    },
+  ]}
+/>
+
+## C before C++
+
+The C `vvector` lab makes the lower layer explicit: raw storage, element size, allocation and the bookkeeping a generic container needs. It is a useful comparison with the typed object-lifetime rules in C++.
+
+| C lab                                   | C++ lab                                   |
+| --------------------------------------- | ----------------------------------------- |
+| Explicit byte storage and element sizes | Typed allocator-backed storage            |
+| Manual resource protocol                | Construction, destruction and RAII        |
+| Caller-visible generic storage rules    | Templates, forwarding and exception paths |
+
+[C vvector source →](https://github.com/adrianrusu16/cpp-mastery/blob/master/c/vvector/vvector.c)
+
+## Tooling
+
+The workspace uses CMake with C17 / C++26 settings and explicit warning flags. AddressSanitizer and UndefinedBehaviorSanitizer are enabled for selected targets, including the C vector and RAII labs; sanitizer coverage is not claimed for every target.
+
+Small executables make it easy to isolate a question, inspect output, force a failure and return to the implementation. [Build configuration →](https://github.com/adrianrusu16/cpp-mastery/blob/master/CMakeLists.txt)
+
+## Direction of travel
+
+This work supports a longer move into AOSP, AAOS platform internals and native boundaries. It does not stand in for production platform experience. The aim is to build the understanding needed to reason about ownership, memory and failure when Android application code reaches into lower layers.

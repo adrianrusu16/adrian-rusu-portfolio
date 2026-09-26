@@ -1,0 +1,121 @@
+---
+title: canopy-api
+summary: A shared Protobuf contract that lets PandaEngine and Canopy evolve independently while keeping compatibility explicit.
+label: Versioned API contract
+subtitle: One wire contract. Independent client and server evolution.
+intro: canopy-api defines the shared canopy.v1 Protobuf/gRPC surface between PandaEngine and Canopy. Treating the contract as its own project makes service semantics, generated interfaces and compatibility deliberate engineering concerns.
+tags: [Protobuf, gRPC, Buf, Versioning]
+order: 3
+kind: contract
+repository: https://github.com/adrianrusu16/canopy-api
+repositoryVisibility: public
+image: /images/diagrams/canopy-api.svg
+imageAlt: A canopy.v1 Protobuf contract generates immutable SDKs for PandaEngine and Canopy
+socialImage: /images/og-canopy-api.png
+seoTitle: canopy-api — Versioned Protobuf & gRPC Contract | Adrian Rusu
+related: [pandawave, canopy]
+---
+
+import Diagram from '../../components/Diagram.astro';
+import EvidenceCards from '../../components/EvidenceCards.astro';
+import Flow from '../../components/Flow.astro';
+
+## The contract is a project
+
+<Diagram
+  name="canopy-api"
+  alt="The canopy.v1 Protobuf/gRPC contract passes Buf lint, build and breaking-change checks, then generates immutable SDKs consumed by PandaEngine and Canopy."
+  caption="Contract-level overview of the public canopy.v1 contract and its compatibility boundary."
+/>
+
+A request field, pagination rule, identity requirement or status code is part of the shared behavior. Keeping these decisions outside either implementation makes the seam visible and lets client and server changes be reviewed against the same contract.
+
+## Service surface
+
+| Service            | Contract responsibility                          |
+| ------------------ | ------------------------------------------------ |
+| `CatalogService`   | Hierarchical browse and search                   |
+| `PlaybackService`  | Authorized playback-source resolution            |
+| `DiscoveryService` | Discovery, For You and recommendation feeds      |
+| `AuthService`      | Accounts, verification, credentials and sessions |
+| `ProfileService`   | Profile-owned preferences and state              |
+| `HistoryService`   | Playback history                                 |
+| `LibraryService`   | Saved library relationships                      |
+| `PlaylistService`  | Playlists and their items                        |
+| `SystemService`    | Health and version information                   |
+
+Player commands and queue policy remain client-domain concerns in PandaEngine. This service matrix describes the wire-level responsibilities, not private message definitions.
+
+## Why a separate repository
+
+The Android/Rust client and the backend should be able to evolve independently without carrying separate copies of the API definition. A dedicated contract project provides one place for service semantics, package/version boundaries and generated SDK distribution.
+
+The public [Canopy architecture](https://github.com/adrianrusu16/Canopy/blob/master/docs/architecture.md) and [PandaEngine host contract](https://github.com/adrianrusu16/Media-App/blob/master/docs/native-engine-host.md) show how both sides consume that shared surface.
+
+## Compatibility is a design concern
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Lint and build',
+      text: 'Buf validates the schema surface before it becomes a generated interface consumed by another repository.',
+    },
+    {
+      title: 'Breaking-change checks',
+      text: 'Compatibility checks compare contract changes against a baseline, making wire-breaking changes visible during review.',
+    },
+    {
+      title: 'Generated SDK distribution',
+      text: 'Generated packages carry the canonical types into client and server builds, reducing handwritten contract duplication.',
+    },
+  ]}
+/>
+
+## Immutable version pinning
+
+<div className="status-columns">
+  <section>
+    <span className="eyebrow">MOVING DEPENDENCY</span>
+    <h3>A label that can move</h3>
+    <p>
+      A consumer follows whatever a branch or mutable reference points to. Rebuilding later may
+      select a different schema revision.
+    </p>
+  </section>
+  <section>
+    <span className="eyebrow">IMMUTABLE PIN</span>
+    <h3>A known contract revision</h3>
+    <p>
+      Client and server consume a specific generated SDK revision. Changes become explicit upgrades
+      that can be reviewed, tested and reproduced.
+    </p>
+  </section>
+</div>
+
+<Flow
+  label="Explicit contract upgrade"
+  steps={[
+    { title: 'Contract change', detail: 'Review semantics' },
+    { title: 'Compatibility gate', detail: 'Lint + build + breaking' },
+    { title: 'Immutable SDK revision', detail: 'Known generated artifact' },
+    { title: 'Consumer upgrade', detail: 'Test both sides' },
+  ]}
+/>
+
+## Fail-closed identity semantics
+
+> Optional authentication is not permission to ignore invalid authentication.
+
+A request without identity may be allowed on an anonymous surface. A request that supplies invalid identity must fail rather than quietly downgrade. That distinction belongs in the shared semantics so every adapter preserves it.
+
+| Request context                               | Expected interpretation          |
+| --------------------------------------------- | -------------------------------- |
+| No identity on an anonymous-capable operation | Apply anonymous policy           |
+| Valid identity                                | Apply authenticated policy       |
+| Supplied invalid, expired or revoked identity | Reject; do not retry anonymously |
+
+This behavior is described in the public [Canopy playback contract](https://github.com/adrianrusu16/Canopy/blob/master/docs/playback.md). No tokens, private proto contents or internal credentials are included in this case study.
+
+## What this demonstrates
+
+The interesting part of an API is the agreement it preserves: ownership, failure semantics, compatibility and a repeatable way for independently built components to speak the same language. PandaWave and Canopy show the two sides of that agreement.

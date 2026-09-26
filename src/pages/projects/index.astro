@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Projects — Adrian Rusu"
+  description="Personal engineering projects across Android Automotive, Rust backends, API contracts, and modern C++."
+  ><section class="page-intro">
+    <div class="container">
+      <span class="eyebrow">SELECTED WORK / PERSONAL PROJECTS</span><h1>
+        Follow the system.<br /><span class="muted">Beyond the screen.</span>
+      </h1><p class="intro-description">
+        Four connected explorations of media, platform boundaries, and the engineering underneath.
+      </p>
+    </div>
+  </section><section class="section container project-list">
+    <div class="project-grid">{projects.map((p) => <ProjectCard id={p.id} {...p.data} />)}</div>
+  </section></BaseLayout
+>

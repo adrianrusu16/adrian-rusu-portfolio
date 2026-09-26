@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import SourceLink from '../../components/SourceLink.astro';
+import CaseToc from '../../components/CaseToc.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import ContentLink from '../../components/ContentLink.astro';
+import { getCollection, render } from 'astro:content';
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+const { project } = Astro.props;
+const { Content, headings } = await render(project);
+const all = await getCollection('projects');
+const related = project.data.related
+  .map((id: string) => all.find((p) => p.id === id))
+  .filter(Boolean);
+const firstAnchor =
+  project.id === 'pandawave' || project.id === 'canopy'
+    ? 'architecture'
+    : headings.find((h) => h.depth === 2)?.slug;
+---
+
+<BaseLayout
+  title={project.data.seoTitle}
+  description={project.data.summary}
+  socialImage={project.data.socialImage}
+>
+  <section class="page-intro case-intro">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/projects/">Projects</a><Icon name="chevron" size={14} /><span
+          >{project.data.title}</span
+        >
+      </div>
+      <span class="eyebrow">{project.data.label.toUpperCase()} / PERSONAL PROJECT</span>
+      <h1>{project.data.title}<span class="title-dot">.</span></h1>
+      <p class="intro-description">{project.data.subtitle}</p>
+      <div class="tags">{project.data.tags.map((t: string) => <span>{t}</span>)}</div>
+      <div class="case-actions">
+        <SourceLink href={project.data.repository} />{
+          firstAnchor && (
+            <a class="text-link" href={`#${firstAnchor}`}>
+              {project.id === 'pandawave' || project.id === 'canopy'
+                ? 'Explore architecture'
+                : 'Explore the work'}{' '}
+              ↓
+            </a>
+          )
+        }
+      </div>
+      {
+        project.id === 'pandawave' && (
+          <figure class="case-hero-shot">
+            <>
+              <a
+                href={project.data.image}
+                data-lightbox
+                data-title="PandaWave Home"
+                data-caption="Discovery and recommendations running in AAOS."
+                aria-label="Enlarge PandaWave home screenshot"
+              >
+                <>
+                  <img
+                    src={project.data.image}
+                    srcset="/images/pandawave/home-small.webp 700w, /images/pandawave/home.webp 1408w"
+                    sizes="(max-width: 780px) 90vw, 1200px"
+                    alt={project.data.imageAlt}
+                    width="1408"
+                    height="792"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                  <span class="zoom-hint" aria-hidden="true">
+                    ↗
+                  </span>
+                </>
+              </a>
+              <figcaption>
+                Compose HMI · AAOS platform integration · Rust-owned client state
+              </figcaption>
+            </>
+          </figure>
+        )
+      }
+    </div>
+  </section>
+  <div class="container case-layout">
+    <CaseToc headings={headings} /><article class="case-content">
+      <p class="case-lead">{project.data.intro}</p><div class="prose">
+        <Content components={{ a: ContentLink }} />
+      </div>
+      <nav class="related-projects" aria-label="Related projects">
+        <span class="eyebrow">CONTINUE EXPLORING</span><div>
+          {
+            related.map(
+              (p) =>
+                p && (
+                  <a href={`/projects/${p.id}/`}>
+                    <>
+                      <span>
+                        <>
+                          <strong>{p.data.title}</strong>
+                          <small>{p.data.label}</small>
+                        </>
+                      </span>
+                      <Icon name="arrow" size={22} />
+                    </>
+                  </a>
+                ),
+            )
+          }
+        </div>
+      </nav>
+    </article>
+  </div>
+  {project.id === 'pandawave' && <Lightbox />}
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Portrait from '../components/Portrait.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+---
+
+<BaseLayout
+  title="About — Adrian Rusu"
+  description="The engineer behind the work: automotive media, Android performance and hands-on systems learning."
+>
+  <section class="page-intro">
+    <div class="container about-hero">
+      <div>
+        <span class="eyebrow">THE ENGINEER BEHIND THE WORK</span><h1>
+          Hi, I’m Adrian.<br /><span class="muted">I like to look underneath.</span>
+        </h1><p class="intro-description">
+          I work on automotive media experiences. The further I go, the more interested I become in
+          what makes those experiences work.
+        </p><ContactStrip />
+      </div><figure class="portrait-frame">
+        <Portrait /><figcaption>Adrian Rusu <span>Senior Android / AAOS Engineer</span></figcaption>
+      </figure>
+    </div>
+  </section>
+  <section class="section container about-layout">
+    <div class="prose">
+      <h2>From Android to automotive</h2><p>
+        My path has moved from Android applications toward automotive and AAOS. Working on media in
+        a car brings platform behavior into everyday product decisions: how playback responds, how
+        focus moves, what remains available while driving and what the system does when conditions
+        change.
+      </p><p>
+        That is the part I keep coming back to. A good screen is the visible result of many
+        less-visible engineering decisions.
+      </p>
+      <h2>What keeps me interested</h2><p>
+        Media systems, performance and the boundaries between components. I want to understand who
+        owns a piece of state, what crosses a process boundary and which work is actually on the
+        critical path.
+      </p><p>
+        PandaWave is where I explore those questions through Android, Rust and backend design.
+        Canopy and canopy-api give the other side of those boundaries their own attention.
+      </p>
+      <h2>What I’m learning</h2><p>
+        I’m moving deeper into AOSP and modern C++. C++ Mastery gives that learning a concrete form
+        through lifetime tracing, RAII, generic programming, custom containers, exception-safety
+        experiments and sanitizer-backed labs.
+      </p><a href="/projects/cpp-mastery/" class="text-link"
+        >Explore C++ Mastery <Icon name="right" size={18} /></a
+      >
+      <h2>How I use AI</h2><p>
+        I use Claude and Codex as engineering tools for repository exploration, implementation
+        support, debugging and review. The responsibility for understanding the code and verifying
+        the result remains mine.
+      </p><p>
+        I also maintain reusable Claude skills around GitHub and Jira workflows and adapt useful
+        workflows across Codex and Claude rather than treating agent output as a black box.
+      </p>
+    </div><aside class="about-callout">
+      <span class="eyebrow">CURRENT FOCUS</span><h3>
+        Android at the surface.<br />Systems at the core.
+      </h3><p>
+        Automotive media is my professional focus. Native boundaries, AOSP and platform engineering
+        are where I’m deliberately going next.
+      </p><div class="tags">
+        <span>AAOS</span><span>Android Media</span><span>Performance</span><span>Rust</span><span
+          >AOSP</span
+        ><span>C++</span>
+      </div><a href="/projects/pandawave/" class="text-link"
+        >See that thinking in PandaWave <Icon name="arrow" size={18} /></a
+      >
+    </aside>
+  </section>
+</BaseLayout>

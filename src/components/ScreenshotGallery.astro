@@ -1,0 +1,51 @@
+---
+import shots from '../data/screenshots.json';
+interface Props {
+  items: { id: keyof typeof shots; title: string; caption: string }[];
+}
+const { items } = Astro.props;
+---
+
+<div class="screenshot-gallery">
+  {
+    items.map((item) => {
+      const shot = shots[item.id];
+      return (
+        <figure>
+          <>
+            <a
+              href={shot.src}
+              data-lightbox
+              data-title={item.title}
+              data-caption={item.caption}
+              aria-label={`Enlarge ${item.title} screenshot`}
+            >
+              <>
+                <img
+                  src={shot.src}
+                  srcset={`${shot.src.replace('.webp', '-small.webp')} 700w, ${shot.src} ${shot.width}w`}
+                  sizes="(max-width: 780px) 90vw, 40vw"
+                  alt={`PandaWave ${item.title}`}
+                  width={shot.width}
+                  height={shot.height}
+                  loading="lazy"
+                  fetchpriority="low"
+                  decoding="async"
+                />
+                <span class="zoom-hint" aria-hidden="true">
+                  ↗
+                </span>
+              </>
+            </a>
+            <figcaption>
+              <>
+                <strong>{item.title}</strong>
+                <span>{item.caption}</span>
+              </>
+            </figcaption>
+          </>
+        </figure>
+      );
+    })
+  }
+</div>

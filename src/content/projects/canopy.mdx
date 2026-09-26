@@ -1,0 +1,161 @@
+---
+title: Canopy
+summary: The Rust control plane behind PandaWave. Identity, catalog/search, profile state and playback authorization over gRPC, with PostgreSQL as the policy authority and Nginx handling protected media delivery.
+label: Rust media backend
+subtitle: The Rust control plane behind PandaWave.
+intro: Canopy owns durable backend state, identity and media policy. PandaEngine owns client playback state and queue behavior. Keeping that line explicit makes it possible to reason about what a caller may access without distributing backend policy into Android.
+tags: [Rust, gRPC, PostgreSQL, Tonic]
+order: 2
+kind: backend
+repository: https://github.com/adrianrusu16/Canopy
+repositoryVisibility: public
+image: /images/diagrams/canopy.svg
+imageAlt: Canopy gRPC services and PostgreSQL policy authority, separate from the Nginx media byte path
+socialImage: /images/og-canopy.png
+seoTitle: Canopy — Rust Media Backend & Playback Authorization | Adrian Rusu
+related: [pandawave, canopy-api]
+---
+
+import Diagram from '../../components/Diagram.astro';
+import EvidenceCards from '../../components/EvidenceCards.astro';
+import Flow from '../../components/Flow.astro';
+
+## Architecture
+
+Canopy separates transport adapters, domain services and repository ports. PostgreSQL is authoritative for identity, metadata, visibility and current playback policy. Nginx handles the authorized byte stream.
+
+<Diagram
+  name="canopy"
+  alt="PandaEngine calls Canopy over gRPC. Identity, catalog, discovery, profile and playback services use repository ports backed by PostgreSQL. Android requests media from Nginx, which rechecks policy with Canopy before reading managed media."
+  caption="Control decisions travel through gRPC. Audio bytes do not."
+/>
+
+| Boundary        | Responsibility                                                               |
+| --------------- | ---------------------------------------------------------------------------- |
+| `canopy-proto`  | Facade over the immutable generated canopy.v1 SDK                            |
+| `canopy-core`   | Domain values, errors and repository ports; no transport/database dependency |
+| `canopy-server` | Tonic adapters, application services, storage adapters and runtime wiring    |
+| PostgreSQL      | Authoritative data and policy                                                |
+| Nginx           | Authorized byte-range delivery from managed media                            |
+
+[Architecture and workspace boundaries →](https://github.com/adrianrusu16/Canopy/blob/master/docs/architecture.md)
+
+## Service surface
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Catalog and discovery',
+      text: 'Hierarchical browsing, text search, discovery, For You and recommendation feeds. Visibility policy is applied before counting and pagination.',
+    },
+    {
+      title: 'Identity',
+      text: 'Accounts, email verification, credentials, native device sessions, refresh rotation, revocation and recovery in PostgreSQL builds.',
+    },
+    {
+      title: 'Profile-owned state',
+      text: 'Profiles, preferences, history, library and playlists persist behind ownership-aware repository boundaries.',
+    },
+    {
+      title: 'Playback',
+      text: 'Resolve an eligible asset under current policy, issue a short-lived opaque capability, and reauthorize each media request.',
+    },
+  ]}
+/>
+
+System health and readiness complete the operational surface. Player commands, queue management, seeking and MediaSession state remain in PandaEngine.
+
+## Why Rust
+
+Rust gives the backend explicit types for domain values, ownership for shared state and a practical async runtime through Tokio and Tonic. The goal is a backend whose policy and failure paths remain understandable as the service grows. The implementation keeps core repository ports independent of transport and database details.
+
+## Search belongs on the backend
+
+<Flow
+  label="Illustrative fuzzy-search pipeline"
+  steps={[
+    { title: 'mettalica', detail: 'Illustrative input' },
+    { title: 'Normalize query', detail: 'One backend interpretation' },
+    { title: 'Trigram candidates', detail: 'PostgreSQL pg_trgm' },
+    { title: 'Rank → Metallica', detail: 'Illustrative candidate' },
+  ]}
+/>
+
+This is an illustration of the search pipeline, not a captured production query result. Matching and ranking live alongside catalog data and visibility policy, so the Android client can submit intent and present results. PostgreSQL trigram search supports approximate matching without a second client-side search implementation.
+
+[Catalog/search implementation](https://github.com/adrianrusu16/Canopy/tree/master/crates) · [Search and policy architecture](https://github.com/adrianrusu16/Canopy/blob/master/docs/architecture.md)
+
+## Identity and sessions
+
+<Flow
+  label="Identity and device-session lifecycle"
+  steps={[
+    { title: 'Register → verify', detail: 'Account identity' },
+    { title: 'Sign in', detail: 'Native device session' },
+    { title: 'Rotate refresh token', detail: 'Session continuity' },
+    { title: 'Revoke / recover', detail: 'Explicit lifecycle paths' },
+  ]}
+/>
+
+Authenticated operations resolve the active device session on the server. Optional identity does not mean permissive identity: invalid, malformed, expired or revoked authorization fails closed rather than silently becoming an anonymous request.
+
+[Authentication design →](https://github.com/adrianrusu16/Canopy/blob/master/docs/authentication.md)
+
+## Playback authorization
+
+<Flow
+  label="Opaque playback capability lifecycle"
+  steps={[
+    { title: 'Resolve playback', detail: 'PandaEngine → gRPC' },
+    { title: 'Select eligible asset', detail: 'Current PostgreSQL policy' },
+    { title: 'Issue opaque capability', detail: 'Short-lived stream URL' },
+    { title: 'HTTP Range request', detail: 'Android player → Nginx' },
+    { title: 'Revalidate policy', detail: 'Nginx → private Canopy authorizer' },
+    { title: 'Deliver bytes', detail: 'Nginx → Android player' },
+  ]}
+/>
+
+> Control decisions travel through gRPC. Audio bytes do not.
+
+The capability contains an asset identity, audience, expiry, version and nonce — no storage key. The client uses the URL as an opaque value. Nginx asks Canopy to recheck current policy for each request before an internal media redirect permits delivery.
+
+That makes policy changes effective even when a capability has not expired. Repository failures remain errors; they do not become a reason to relax visibility or fall back to a different audience.
+
+[Playback, policy and streaming details →](https://github.com/adrianrusu16/Canopy/blob/master/docs/playback.md)
+
+## What to verify
+
+| Boundary            | Invariant                                 | Evidence / test direction                           |
+| ------------------- | ----------------------------------------- | --------------------------------------------------- |
+| Optional identity   | Invalid supplied identity fails closed    | Malformed, expired and revoked session cases        |
+| Catalog and profile | Inaccessible data stays inaccessible      | Visibility filtering, ownership and pagination      |
+| Playback resolution | Only eligible assets produce capabilities | Public, owner and non-owner policy matrix           |
+| Media delivery      | Current policy is checked again           | Expired capability, policy change and Range request |
+| Repository failure  | Failure cannot weaken authorization       | Storage errors propagate as service failures        |
+
+These are the verification boundaries documented by the repository, not a claim that a production availability target or load benchmark has been measured.
+
+## Current engineering focus
+
+<div className="status-columns">
+  <section>
+    <span className="eyebrow">CURRENT IMPLEMENTATION</span>
+    <ul>
+      <li>Tonic gRPC services and PostgreSQL repositories</li>
+      <li>Native identity and profile-owned state</li>
+      <li>Catalog/search and policy-aware playback resolution</li>
+      <li>Nginx authorization and ranged media delivery</li>
+    </ul>
+  </section>
+  <section>
+    <span className="eyebrow">NEXT HARDENING WORK</span>
+    <ul>
+      <li>Operational validation and recovery behavior</li>
+      <li>Broader deployment and policy-boundary tests</li>
+      <li>Measured capacity and performance work</li>
+      <li>Future cache and sync experiments</li>
+    </ul>
+  </section>
+</div>
+
+Redis / JadeCache and RustFS are reserved infrastructure in the repository; they are not active playback dependencies. [Current roadmap →](https://github.com/adrianrusu16/Canopy/blob/master/docs/roadmap.md)

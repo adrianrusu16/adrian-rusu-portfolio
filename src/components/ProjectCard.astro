@@ -1,0 +1,51 @@
+---
+import Icon from './Icon.astro';
+import SourceLink from './SourceLink.astro';
+interface Props {
+  id: string;
+  title: string;
+  summary: string;
+  label: string;
+  tags: string[];
+  kind: string;
+  order: number;
+  repository?: string;
+  image: string;
+  imageAlt: string;
+}
+const { id, title, summary, label, tags, kind, order, repository, image, imageAlt } = Astro.props;
+---
+
+<article class:list={['project-card', kind]}>
+  <a class="card-visual" href={`/projects/${id}/`} aria-label={`Explore ${title}`}
+    ><img
+      src={image}
+      alt={imageAlt}
+      width="960"
+      height={kind === 'flagship' ? 540 : 560}
+      loading="lazy"
+      fetchpriority="low"
+      decoding="async"
+    /></a
+  >
+  <div class="card-copy">
+    <div class="card-top">
+      <span class="eyebrow">{label}</span><span class="project-number">0{order}</span>
+    </div>
+    <h3><a href={`/projects/${id}/`}>{title}</a></h3><p>{summary}</p>
+    <div class="tags">{tags.map((tag) => <span>{tag}</span>)}</div>
+    <div class="card-bottom">
+      <a href={`/projects/${id}/`}
+        >{
+          kind === 'lab'
+            ? 'Explore the learning lab'
+            : kind === 'contract'
+              ? 'Explore the contract'
+              : 'Read the case study'
+        }
+        <Icon name="right" size={16} /></a
+      >
+    </div>
+    <SourceLink href={repository} label="GitHub" />
+  </div>
+</article>

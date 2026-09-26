@@ -1,0 +1,5 @@
+dist
+node_modules
+.astro
+.sites-runtime
+pnpm-lock.yaml

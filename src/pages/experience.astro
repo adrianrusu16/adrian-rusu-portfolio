@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const themes = [
+  {
+    title: 'Media',
+    items: [
+      'MediaSession & MediaBrowser',
+      'Media API',
+      'Audio focus',
+      'Playback queues',
+      'ContentProvider',
+    ],
+  },
+  {
+    title: 'Automotive',
+    items: [
+      'Rotary / DPAD',
+      'Steering-wheel controls',
+      'UX restrictions',
+      'RRO',
+      'OEM / platform variants',
+    ],
+  },
+  {
+    title: 'Performance',
+    items: [
+      'Perfetto · ATrace · Android Profiler',
+      'ANR investigation · LeakCanary',
+      'Startup · rendering · jank · memory',
+    ],
+  },
+  {
+    title: 'Leadership',
+    items: [
+      'Feature ownership',
+      'Code / PR reviews',
+      'Onboarding / buddy work',
+      'Technical interviews',
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Experience — Adrian Rusu"
+  description="Production Android Automotive media experience at AscentCore / SiriusXM, preceded by Android development at Endava."
+>
+  <section class="page-intro">
+    <div class="container">
+      <span class="eyebrow">PROFESSIONAL EXPERIENCE</span><h1>
+        Engineering for<br /><span class="muted">the real-world drive.</span>
+      </h1><p class="intro-description">
+        Production automotive media, where platform behavior, product expectations and user
+        experience meet.
+      </p>
+    </div>
+  </section>
+  <section class="section container">
+    <article class="career-entry">
+      <div class="career-aside">
+        <span class="company-label">AscentCore</span><p class="career-date">Aug 2023 — Present</p><p
+        >
+          SiriusXM engagement<br />Automotive media HMI
+        </p>
+      </div><div>
+        <h2>Senior Android /<br />AAOS Developer</h2><p class="summary">
+          I develop and own features for a production Android Automotive media HMI, working across
+          media integration, automotive interaction, performance investigation, OEM behavior and a
+          mature Kotlin/Java codebase.
+        </p>
+        <div class="theme-grid">
+          {
+            themes.map((t) => (
+              <div class="theme-card">
+                <>
+                  <h3>{t.title}</h3>
+                  <ul>
+                    {t.items.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                </>
+              </div>
+            ))
+          }
+        </div>
+        <dl class="experience-rows">
+          <div>
+            <dt>Engineering stack</dt><dd>
+              Kotlin · Java · XML · Custom Views · RecyclerView · RxJava · Dagger 2 · Gradle ·
+              Jenkins · Mockito · Espresso · Gherkin
+            </dd>
+          </div><div>
+            <dt>Cross-functional work</dt><dd>
+              QA · Middleware · Backend · Product · Architecture
+            </dd>
+          </div><div>
+            <dt>AI-assisted engineering</dt><dd>
+              Claude · Codex · reusable GitHub/Jira workflow skills
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </article>
+    <article class="career-entry">
+      <div class="career-aside">
+        <span class="company-label">Endava</span><p class="career-date">Nov 2021 — Jun 2023</p><p>
+          Android Developer
+        </p><p>Internship<br />Oct 2021 — Nov 2021</p>
+      </div><div>
+        <h2>The Android foundation</h2><p class="summary">
+          I built Android applications in Java and Kotlin before moving into senior automotive media
+          work.
+        </p><div class="theme-grid">
+          <div class="theme-card">
+            <h3>POS and hardware integration</h3><p>
+              A point-of-sale solution combining BLE/payment hardware, WebView flows, encrypted
+              offline transactions and synchronization.
+            </p>
+          </div><div class="theme-card">
+            <h3>Early automotive work</h3><p>
+              An internal Android Automotive project covering automotive UI, maps/navigation and
+              text-to-speech integration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </article>
+    <div class="wide-prose">
+      <span class="eyebrow">FROM PRODUCTION TO PERSONAL EXPLORATION</span><p class="boundary-note">
+        The public case studies on this site focus on personal projects. Commercial work is
+        represented through responsibilities, technologies and areas of practice rather than
+        proprietary code, screenshots or internal architecture.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

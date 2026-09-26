@@ -1,0 +1,68 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+const { headings } = Astro.props;
+---
+
+<aside class="case-sidebar">
+  <button type="button" class="toc-toggle" aria-expanded="false" aria-controls="case-sections"
+    >On this page <span aria-hidden="true">↓</span></button
+  >
+  <nav id="case-sections" aria-label="On this page">
+    <span class="eyebrow">IN THIS CASE STUDY</span><ol>
+      {
+        headings
+          .filter((h) => h.depth === 2)
+          .map((h) => (
+            <li>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))
+      }
+    </ol>
+  </nav>
+</aside>
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.toc-toggle');
+  const sidebar = document.querySelector<HTMLElement>('.case-sidebar');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    sidebar?.classList.toggle('toc-open', open);
+  });
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('#case-sections a')];
+  const sections = links
+    .map((link) => document.getElementById(link.hash.slice(1)))
+    .filter((el): el is HTMLElement => Boolean(el));
+  function setActive(id: string) {
+    links.forEach((link) => {
+      if (link.hash === `#${id}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  if (sections.length) setActive(sections[0].id);
+  let queued = false;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        let current = sections[0];
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= 180) current = section;
+        }
+        if (current) setActive(current.id);
+        queued = false;
+      });
+    },
+    { passive: true },
+  );
+  links.forEach((link) =>
+    link.addEventListener('click', () => {
+      toggle?.setAttribute('aria-expanded', 'false');
+      sidebar?.classList.remove('toc-open');
+    }),
+  );
+</script>

@@ -1,0 +1,172 @@
+---
+import '../styles/global.css';
+import '../styles/evidence.css';
+import Icon from '../components/Icon.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import { identity } from '../data/identity';
+interface Props {
+  title?: string;
+  description?: string;
+  socialImage?: string;
+}
+const {
+  title = 'Adrian Rusu — Android Automotive Engineer',
+  description = 'Senior Android / AAOS Engineer. Automotive media, performance engineering, and systems exploration through Kotlin, Rust, and C++.',
+  socialImage = '/images/social-card.png',
+} = Astro.props;
+const path = Astro.url.pathname;
+const links = [
+  ['Home', '/'],
+  ['Projects', '/projects/'],
+  ['Experience', '/experience/'],
+  ['About', '/about/'],
+];
+const linkedIn = identity.linkedIn;
+const canonical = Astro.site ? new URL(path, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head
+    ><meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    /><meta name="theme-color" content="#0b0e13" /><title>{title}</title><meta
+      name="description"
+      content={description}
+    /><link rel="icon" type="image/svg+xml" href="/favicon.svg" /><link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />{
+      path === '/' && (
+        <link rel="preload" as="image" href="/images/cockpit-hero.webp" fetchpriority="high" />
+      )
+    }<link rel="manifest" href="/site.webmanifest" />{
+      canonical && <link rel="canonical" href={canonical} />
+    }<meta property="og:type" content="website" /><meta property="og:title" content={title} /><meta
+      property="og:description"
+      content={description}
+    />{canonical && <meta property="og:url" content={canonical} />}<meta
+      name="twitter:card"
+      content="summary_large_image"
+    /><meta name="twitter:title" content={title} /><meta
+      name="twitter:description"
+      content={description}
+    /><meta property="og:image" content={new URL(socialImage, Astro.site).href} /><meta
+      name="twitter:image"
+      content={new URL(socialImage, Astro.site).href}
+    /><meta property="og:image:alt" content={title} /><script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Adrian Rusu',
+        jobTitle: 'Senior Android / AAOS Engineer',
+        url: Astro.site?.href,
+        email: `mailto:${identity.email}`,
+        sameAs: [linkedIn, identity.github],
+        knowsAbout: [
+          'Android Automotive',
+          'Android Media',
+          'Performance Engineering',
+          'Rust',
+          'C++',
+        ],
+      })}
+    /><slot name="head" /></head
+  >
+  <body
+    ><a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand" aria-label="Adrian Rusu, home"
+          ><span class="monogram">ar<span>.</span></span><span>Adrian Rusu</span></a
+        ><nav class="desktop-nav" aria-label="Main navigation">
+          {
+            links.map(([label, href]) => (
+              <a
+                href={href}
+                aria-current={
+                  (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
+                }
+              >
+                {label}
+              </a>
+            ))
+          }
+        </nav><div class="header-actions">
+          <a class="header-github" href={identity.github} target="_blank" rel="noopener noreferrer"
+            >GitHub <Icon name="arrow" size={15} /></a
+          >
+          <a class="cv-link" href="/resume/">Résumé <Icon name="arrow" size={16} /></a><button
+            class="menu-button"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            aria-label="Open navigation"><Icon name="menu" /></button
+          >
+        </div>
+      </div><nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation" hidden>
+        {
+          links.map(([label, href]) => (
+            <a
+              href={href}
+              aria-current={
+                (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
+              }
+            >
+              {label}
+            </a>
+          ))
+        }
+        <a href={identity.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a href="/resume/">Résumé ↗</a>
+      </nav>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-top">
+          <div>
+            <span class="eyebrow">LET’S CONNECT</span><h2>
+              Good engineering starts<br />with a conversation.
+            </h2>
+          </div><ContactStrip />
+        </div><div class="footer-bottom">
+          <a class="brand" href="/"
+            ><span class="monogram">ar<span>.</span></span><span>Adrian Rusu</span></a
+          ><span>Android Automotive · Media · Systems</span><span
+            >© {new Date().getFullYear()} Adrian Rusu</span
+          >
+        </div>
+      </div>
+    </footer>
+    <script>
+      const trigger = document.querySelector<HTMLButtonElement>('.menu-button');
+      const menu = document.querySelector<HTMLElement>('#mobile-nav');
+      function closeMenu() {
+        if (trigger && menu) {
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.setAttribute('aria-label', 'Open navigation');
+          menu.hidden = true;
+        }
+      }
+      trigger?.addEventListener('click', () => {
+        if (!menu) return;
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        trigger.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
+        menu.hidden = open;
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && trigger?.getAttribute('aria-expanded') === 'true') {
+          closeMenu();
+          trigger.focus();
+        }
+      });
+      menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+    </script>
+  </body>
+</html>

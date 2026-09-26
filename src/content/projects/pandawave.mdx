@@ -1,0 +1,348 @@
+---
+title: PandaWave
+summary: An AAOS media platform built to explore what lives underneath the screen.
+label: Automotive media platform
+subtitle: An AAOS-first media platform with Android at the surface and Rust at the core.
+intro: I started PandaWave to explore the parts of an automotive media system that sit underneath the screen — process boundaries, state ownership, platform integration, native code and backend policy. Kotlin owns the HMI and Android integration, PandaEngine owns client-side domain state in Rust, and Canopy owns durable backend policy and media resolution.
+tags: [AAOS, Kotlin, Compose, Media3, Binder / AIDL, JNI / FFI, Rust, gRPC]
+order: 1
+kind: flagship
+featured: true
+repository: https://github.com/adrianrusu16/Media-App
+repositoryVisibility: public
+image: /images/pandawave/home.webp
+imageAlt: PandaWave recommendations and media playback running in Android Automotive
+socialImage: /images/og-pandawave.png
+seoTitle: PandaWave — AAOS Media Platform, Kotlin & Rust | Adrian Rusu
+related: [canopy, canopy-api]
+---
+
+import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
+import Diagram from '../../components/Diagram.astro';
+import EvidenceCards from '../../components/EvidenceCards.astro';
+import Flow from '../../components/Flow.astro';
+
+## The experience is on screen.
+
+The architecture supports a real automotive media experience. These screens come from the project’s AAOS captures.
+
+<ScreenshotGallery
+  items={[
+    {
+      id: 'home',
+      title: 'Home',
+      caption:
+        'Discovery and recommendation state projected into the Compose HMI from the engine boundary.',
+    },
+    {
+      id: 'now-playing',
+      title: 'Now Playing',
+      caption:
+        'Playback intent, observed Media3 state and user-visible controls meet at the same engine boundary.',
+    },
+    {
+      id: 'search',
+      title: 'Search',
+      caption:
+        'Search is resolved through Canopy; the Android client does not reproduce backend matching and ranking rules.',
+    },
+    {
+      id: 'library',
+      title: 'Library',
+      caption:
+        'History and library state remain projections of the domain model rather than UI-owned truth.',
+    },
+    {
+      id: 'profile',
+      title: 'Profile',
+      caption:
+        'Profile and session flows cross the same Rust/backend boundary as the rest of the application.',
+    },
+    {
+      id: 'aaos',
+      title: 'AAOS System',
+      caption:
+        'Platform-owned AAOS surfaces consume the same media/session integration used by the in-app HMI.',
+    },
+  ]}
+/>
+
+## The question
+
+An automotive media experience crosses more boundaries than its interface reveals. A tap can become a playback request, a service call, a native state transition and a backend operation. Android also has lifecycle and playback state of its own to report.
+
+> What if playback state, backend interaction and domain rules lived outside the Android UI process boundary?
+
+PandaWave is my exploration of that question. Compose presents state. Android adapts platform capabilities. PandaEngine owns the client-side domain model.
+
+## Architecture
+
+<Diagram
+  name="pandawave"
+  alt="AAOS surfaces and Compose or Media3 call EngineGateway, across Binder/AIDL to MediaEngineService, then JNI/FFI to PandaEngine. The engine calls Canopy through canopy-api gRPC; Canopy owns PostgreSQL policy and authorized media delivery."
+  caption="Different boundaries have different failure, lifetime and ownership semantics."
+/>
+
+| Layer             | Owns                                                  |
+| ----------------- | ----------------------------------------------------- |
+| Android / Compose | Presentation, lifecycle and AAOS integration          |
+| Media3            | Platform playback execution and system media surfaces |
+| Binder / AIDL     | The Android process boundary                          |
+| JNI / FFI         | Kotlin ↔ Rust native transport                        |
+| PandaEngine       | Client state and domain policy                        |
+| canopy-api        | The canonical wire contract                           |
+| Canopy            | Durable state, backend policy and media resolution    |
+
+Binder/AIDL, JNI/FFI and gRPC are not interchangeable. The [native host contract](https://github.com/adrianrusu16/Media-App/blob/master/docs/native-engine-host.md) spells out what each layer owns — and what must stay outside it.
+
+## Engineering decisions
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Rust owns domain state',
+      problem:
+        'UI, player and backend can each maintain competing versions of queue, authentication and playback state.',
+      decision: 'PandaEngine owns client-side domain state and policy.',
+      result:
+        'Android presents state and adapts platform capabilities through one engine boundary.',
+    },
+    {
+      title: 'A deliberate service boundary',
+      problem: 'A screen lifetime is different from a media-session lifetime.',
+      decision: 'Host the engine behind MediaEngineService with an explicit Binder/AIDL contract.',
+      result:
+        'Connection, reconnection, failure and state materialization become explicit concerns.',
+    },
+    {
+      title: 'Intent and observation',
+      problem: 'Requesting playback does not mean the platform is already playing.',
+      decision: 'PandaEngine owns intent; Media3 reports the state actually observed on Android.',
+      result:
+        'Buffering, interruption, audio focus and late events are handled as asynchronous behavior.',
+    },
+    {
+      title: 'A narrow native interface',
+      problem:
+        'A broad native API spreads lifetime, error and conversion concerns through the application.',
+      decision: 'Keep JNI/FFI focused on intentional commands and state exchange.',
+      result: 'A smaller set of cross-language concepts to maintain and debug.',
+    },
+    {
+      title: 'Domain sessions, platform cryptography',
+      problem:
+        'Session policy belongs to the domain; protected key storage is an Android capability.',
+      decision:
+        'Keep session meaning in Rust and provide a Keystore-backed cryptographic primitive from Kotlin.',
+      result:
+        'Android supplies protected key access without taking ownership of authentication semantics.',
+    },
+  ]}
+/>
+
+## Intent is not observation.
+
+PandaEngine owns what playback **should do**. Media3 reports what the platform **actually did**.
+
+<Flow
+  label="Playback request and observation loop"
+  steps={[
+    { title: 'User / system command', detail: 'Play, pause, seek or skip' },
+    { title: 'PandaEngine', detail: 'Intent + queue policy' },
+    { title: 'Typed playback effect', detail: 'Explicit platform work' },
+    { title: 'Media3 / ExoPlayer', detail: 'Execute on Android' },
+    { title: 'Observed player event', detail: 'Report actual state' },
+    { title: 'PandaEngine → snapshot', detail: 'Update authoritative state' },
+    { title: 'Compose + AAOS', detail: 'Project the same snapshot' },
+  ]}
+/>
+
+> Each load carries an engine-created playback instance identity, allowing stale events from superseded loads to be rejected.
+
+Media3 observations are therefore correlated with the active engine load instead of being treated as authoritative simply because they arrived last. The surrounding command/event loop is documented under [Playback ownership →](https://github.com/adrianrusu16/Media-App/blob/master/docs/architecture-roadmap.md#playback-ownership).
+
+## Built for automotive
+
+<ScreenshotGallery
+  items={[
+    {
+      id: 'restrictions',
+      title: 'Driving restrictions',
+      caption: 'Browse density and available actions respond to AAOS UX restrictions.',
+    },
+    {
+      id: 'focus',
+      title: 'Focus and controls',
+      caption: 'Visible focus and disabled control states make non-touch interaction inspectable.',
+    },
+    {
+      id: 'aaos',
+      title: 'System integration',
+      caption: 'PandaWave participates in the AAOS launcher and system-owned media surfaces.',
+    },
+  ]}
+/>
+
+Touch is only one input. Rotary, DPAD and controller navigation need predictable focus, useful disabled states and consistent behavior as driving conditions change. These are [platform integration concerns](https://github.com/adrianrusu16/Media-App/blob/master/docs/android-platform-integration.md), not just styling choices.
+
+## Media3 and the AAOS boundary
+
+<Flow
+  label="AAOS system media command path"
+  steps={[
+    { title: 'AAOS system controls', detail: 'Browse + transport commands' },
+    { title: 'MediaLibraryService / Session', detail: 'Android media integration' },
+    { title: 'EngineGateway', detail: 'Shared command contract' },
+    { title: 'Binder → PandaEngine', detail: 'Domain decision + snapshot' },
+  ]}
+/>
+
+System media controls and the in-app HMI enter the same engine boundary. The Android adapter projects engine catalog/state into framework media items and executes platform effects through Media3.
+
+## OEM customization through RRO
+
+<div className="stat-callout">
+  <strong>216</strong>
+  <span>
+    overlayable resources
+    <br />
+    <small>89 color · 99 dimen · 5 drawable · 6 fraction · 17 integer</small>
+  </span>
+</div>
+
+<ScreenshotGallery
+  items={[
+    {
+      id: 'baseline',
+      title: 'Baseline: green + standard rail',
+      caption:
+        'Forest Tech Dark with a green primary and 100dp rail, captured on the same emulator as the overlay.',
+    },
+    {
+      id: 'overlay',
+      title: 'Cyan + wide-rail overlay',
+      caption:
+        'An emulator canary demonstrates color and geometry changes through the resource contract.',
+    },
+  ]}
+/>
+
+The matched captures use the same emulator, theme, density and scroll position. Playback progress differs between the frames and is not an overlay effect.
+
+`ResourceDesignTokenProvider` bridges Android resources into Compose. Public resource names let an OEM overlay adjust colors, spacing, typography, focus treatment and sizing without rewriting UI code. Runtime user themes remain an app preference; RRO is a platform customization boundary.
+
+The [RRO guide](https://github.com/adrianrusu16/Media-App/blob/master/docs/rro-guide/RRO_GUIDE.md) documents the inventory and a built, installed, enabled and rolled-back two-resource canary. That is a targeted contract validation, not a claim that every possible OEM overlay has been exercised.
+
+## Native Android and Rust
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Build and package deliberately',
+      text: 'Gradle builds the Rust/JNI artifacts and synchronizes them into Android packaging. A missing native toolchain is a hard prerequisite failure, not a silent fake-engine fallback.',
+    },
+    {
+      title: 'Four Android ABIs',
+      text: 'arm64-v8a · armeabi-v7a · x86 · x86_64. Native packaging smoke tests complement Kotlin-only checks; a build with native work disabled is not a runtime-validation artifact.',
+    },
+    {
+      title: 'Bound ownership at the ABI',
+      text: 'The Rust FFI facade uses explicit handles, ABI-safe values and panic containment. JNI converts values; the Kotlin host owns native handle lifetime and dispatch.',
+    },
+    {
+      title: 'Keep snapshots compact',
+      text: 'Numeric state travels in compact snapshots. String-heavy metadata is queried and cached by revision, avoiding repeated cross-JNI work when metadata has not changed.',
+    },
+  ]}
+/>
+
+[Native host source and contract](https://github.com/adrianrusu16/Media-App/blob/master/docs/native-engine-host.md) · [Android build integration](https://github.com/adrianrusu16/Media-App/blob/master/docs/android-platform-integration.md)
+
+## Secure sessions
+
+<Flow
+  label="Keystore-backed session persistence"
+  steps={[
+    { title: 'Rust session coordinator', detail: 'Session semantics + rotation' },
+    { title: 'Kotlin crypto bridge', detail: 'Narrow seal / open operation' },
+    { title: 'Android Keystore', detail: 'Non-exportable AES-GCM key' },
+    { title: 'Encrypted Rust envelope', detail: 'Persist without exposing keys' },
+  ]}
+/>
+
+Rust owns the envelope and session lifecycle. Android provides the platform-protected cryptographic operation. Raw tokens, capabilities and deployment secrets do not become UI state. [Secure-storage boundary →](https://github.com/adrianrusu16/Media-App/blob/master/docs/secure-storage.md)
+
+## Performance questions
+
+The useful artifact is a trace that answers a question. These are investigation areas and available tools, not published benchmark results.
+
+| Area      | Question                                               | Evidence to inspect                                 |
+| --------- | ------------------------------------------------------ | --------------------------------------------------- |
+| Startup   | What is on the path to a usable surface?               | Macrobenchmark, Perfetto, startup sections          |
+| Rendering | Which work misses a frame deadline?                    | Frame timeline, Compose/rendering traces            |
+| Binder    | Where does process-boundary latency accumulate?        | ATrace / Perfetto slices and dispatch timing        |
+| JNI       | Are unchanged values repeatedly crossing the boundary? | Native-host traces, metadata revision behavior      |
+| Playback  | Where does request-to-observation time go?             | Engine effects, Media3 events and state transitions |
+
+[Performance infrastructure](https://github.com/adrianrusu16/Media-App/blob/master/docs/build-performance.md) · [CI performance workflow](https://github.com/adrianrusu16/Media-App/blob/master/docs/ci-performance.md)
+
+## Testing the boundaries
+
+<EvidenceCards
+  items={[
+    {
+      title: 'Rust / domain',
+      text: 'Deterministic state transitions, queue behavior, effect routing and backend adapters can be exercised outside an Android screen.',
+    },
+    {
+      title: 'Android instrumentation',
+      text: 'Device/runtime integration and native packaging smoke paths sit in a separate lane from host-side Kotlin tests.',
+    },
+    {
+      title: 'Engine-process recovery',
+      text: 'The recovery test binds the real AIDL service, kills the instrumented :engine PID, observes reconnect, verifies a replacement PID and dispatches an event through recovered Binder.',
+    },
+    {
+      title: 'MediaBrowser smoke',
+      text: 'A framework MediaBrowser connects to the MediaLibraryService and verifies the published library root. The emulator workflow is an explicit CI lane.',
+    },
+    {
+      title: 'Backend round trip',
+      text: 'Canopy integration exercises real transport, session and policy behavior across the Android / Rust / backend boundary.',
+    },
+  ]}
+/>
+
+[Test lanes and runnable commands](https://github.com/adrianrusu16/Media-App/blob/master/docs/testing.md) · [Backend integration](https://github.com/adrianrusu16/Media-App/blob/master/docs/canopy-backend-integration.md)
+
+## Observability
+
+Typed diagnostic events and redacted sinks make boundary failures inspectable without treating tokens, capability URLs, profile data or configuration as harmless log text. Diagnostics should explain state and timing while preserving the same ownership boundaries as the runtime.
+
+[Observability design →](https://github.com/adrianrusu16/Media-App/blob/master/docs/observability.md)
+
+## Current state and next questions
+
+<div className="status-columns">
+  <section>
+    <span className="eyebrow">IMPLEMENTED IN THE REPOSITORY</span>
+    <ul>
+      <li>Compose HMI and AAOS media integration</li>
+      <li>Service-hosted Rust engine with Binder/AIDL and JNI/FFI</li>
+      <li>Canopy adapters and protected session persistence</li>
+      <li>RRO resource contract and emulator canary</li>
+      <li>Process-recovery and platform smoke tests</li>
+    </ul>
+  </section>
+  <section>
+    <span className="eyebrow">EXPLORING NEXT</span>
+    <ul>
+      <li>Deeper AOSP / platform integration</li>
+      <li>Longer-running recovery and lifecycle validation</li>
+      <li>Measurement-driven performance improvements</li>
+      <li>System-image experiments as future work</li>
+    </ul>
+  </section>
+</div>
+
+The wider system continues in **Canopy**, which owns durable backend policy, and **canopy-api**, which makes the wire contract explicit. The cards below connect those case studies.

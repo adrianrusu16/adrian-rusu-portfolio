@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title"><title id="title">C++ object lifetime across nested scopes</title><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#99b7d5"/></marker></defs><rect width="960" height="560" rx="12" fill="#10151d"/>
+<text x="40" y="42" text-anchor="start" fill="#a5b0c0" font-size="16" font-family="monospace">LIFETIME / NESTED SCOPES</text>
+<rect x="40" y="80" width="880" height="415" rx="8" fill="#131b25" stroke="#495a70"/>
+<text x="70" y="119" text-anchor="start" fill="#99b7d5" font-size="19" font-family="Arial, sans-serif">function scope</text>
+<rect x="75" y="153" width="220" height="80" rx="7" fill="#17202b" stroke="#99b7d5" stroke-opacity=".6"/><text x="185.0" y="193.0" text-anchor="middle" fill="#99b7d5" font-size="23" font-family="Arial, sans-serif">Construct a</text><text x="185.0" y="218.0" text-anchor="middle" fill="#a5b0c0" font-size="15" font-family="Arial, sans-serif">Tracer a{1}</text>
+<path d="M298 193L350 193" stroke="#495a70" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+<rect x="359" y="140" width="510" height="212" rx="8" fill="#201b25" stroke="#e5a2b1"/>
+<text x="385" y="176" text-anchor="start" fill="#e5a2b1" font-size="18" font-family="Arial, sans-serif">inner scope</text>
+<rect x="385" y="210" width="210" height="80" rx="7" fill="#17202b" stroke="#99b7d5" stroke-opacity=".6"/><text x="490.0" y="250.0" text-anchor="middle" fill="#99b7d5" font-size="23" font-family="Arial, sans-serif">Construct b</text><text x="490.0" y="275.0" text-anchor="middle" fill="#a5b0c0" font-size="15" font-family="Arial, sans-serif">Tracer b{2}</text>
+<path d="M595 250L638 250" stroke="#495a70" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+<rect x="645" y="210" width="195" height="80" rx="7" fill="#251c28" stroke="#e5a2b1" stroke-opacity=".6"/><text x="742.5" y="250.0" text-anchor="middle" fill="#e5a2b1" font-size="23" font-family="Arial, sans-serif">Destroy b</text><text x="742.5" y="275.0" text-anchor="middle" fill="#a5b0c0" font-size="15" font-family="Arial, sans-serif">Scope ends</text>
+<path d="M740 354L740 414" stroke="#495a70" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+<rect x="550" y="415" width="280" height="60" rx="7" fill="#17202b" stroke="#99b7d5" stroke-opacity=".6"/><text x="690.0" y="452.0" text-anchor="middle" fill="#99b7d5" font-size="23" font-family="Arial, sans-serif">Destroy a</text>
+<text x="90" y="447" text-anchor="start" fill="#a5b0c0" font-size="21" font-family="Arial, sans-serif">Reverse lifetime order.</text>
+</svg>

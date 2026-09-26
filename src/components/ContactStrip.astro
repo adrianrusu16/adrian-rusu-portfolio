@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import { identity } from '../data/identity';
+---
+
+<div class="contact-strip" aria-label="Contact and profiles">
+  <a href={`mailto:${identity.email}`}>Email <Icon name="arrow" size={16} /></a>
+  <a href={identity.linkedIn} target="_blank" rel="noopener noreferrer"
+    >LinkedIn <Icon name="arrow" size={16} /></a
+  >
+  <a href={identity.github} target="_blank" rel="noopener noreferrer"
+    >GitHub <Icon name="arrow" size={16} /></a
+  >
+  <a href={identity.resume} target="_blank" rel="noopener noreferrer"
+    >Résumé <Icon name="arrow" size={16} /></a
+  >
+</div>

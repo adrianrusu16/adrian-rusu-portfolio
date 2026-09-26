@@ -1,0 +1,39 @@
+---
+interface Props {
+  items: {
+    title: string;
+    text?: string;
+    problem?: string;
+    decision?: string;
+    result?: string;
+    href?: string;
+  }[];
+}
+const { items } = Astro.props;
+---
+
+<div class="evidence-grid">
+  {
+    items.map((item) => (
+      <section class="evidence-card">
+        <h3>{item.title}</h3>
+        {item.text && <p>{item.text}</p>}
+        {item.problem && (
+          <dl>
+            <dt>Problem</dt>
+            <dd>{item.problem}</dd>
+            <dt>Decision</dt>
+            <dd>{item.decision}</dd>
+            <dt>Result</dt>
+            <dd>{item.result}</dd>
+          </dl>
+        )}
+        {item.href && (
+          <a href={item.href} target="_blank" rel="noopener noreferrer">
+            Source ↗
+          </a>
+        )}
+      </section>
+    ))
+  }
+</div>
