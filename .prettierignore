@@ -2,4 +2,6 @@ dist
 node_modules
 .astro
 .sites-runtime
+# Local assistant state is not part of the website source.
+.serena
 pnpm-lock.yaml

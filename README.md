@@ -88,7 +88,7 @@ src/
 ├── content/projects/  PandaWave, Canopy, canopy-api, C++ case studies
 ├── data/              identity + image metadata
 ├── layouts/           metadata, navigation, JSON-LD, contact footer
-├── pages/             route entry points, sitemap, robots, llms.txt
+├── pages/             route entry points, sitemap and robots
 └── styles/            shared visual system
 
 public/
@@ -108,7 +108,8 @@ The site includes conventional SEO and machine-readable identity/project context
 - `sameAs` identity links to LinkedIn and GitHub;
 - public project/source URLs close to the technical claims they support;
 - `OAI-SearchBot` crawl access;
-- a concise [`llms.txt`](./public/llms.txt) index for machine-readable project/navigation context.
+- project descriptions and schema generated from the typed Markdown collection;
+- an explicitly non-indexable 404 page.
 
 Search/AEO measurement should happen from real production data after launch — primarily Search Console, PageSpeed/CrUX and, optionally, read-only SEOMonster workflows.
 

@@ -16,6 +16,7 @@ const projects = defineCollection({
     image: z.string(),
     imageAlt: z.string(),
     seoTitle: z.string(),
+    seoDescription: z.string().min(1),
     socialImage: z.string(),
     intro: z.string(),
     related: z.array(z.string()),

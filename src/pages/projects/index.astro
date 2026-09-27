@@ -6,8 +6,24 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 ---
 
 <BaseLayout
-  title="Projects — Adrian Rusu"
+  title="Android Automotive, Rust & C++ Projects — Adrian Rusu"
   description="Personal engineering projects across Android Automotive, Rust backends, API contracts, and modern C++."
+  pageType="CollectionPage"
+  mainEntity={new URL('/projects/#list', Astro.site).href}
+  schema={[
+    {
+      '@type': 'ItemList',
+      '@id': new URL('/projects/#list', Astro.site).href,
+      name: 'Engineering projects by Adrian Rusu',
+      numberOfItems: projects.length,
+      itemListElement: projects.map((project, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: project.data.title,
+        url: new URL(`/projects/${project.id}/`, Astro.site).href,
+      })),
+    },
+  ]}
   ><section class="page-intro">
     <div class="container">
       <span class="eyebrow">SELECTED WORK / PERSONAL PROJECTS</span><h1>

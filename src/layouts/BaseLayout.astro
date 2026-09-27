@@ -4,15 +4,24 @@ import '../styles/evidence.css';
 import Icon from '../components/Icon.astro';
 import ContactStrip from '../components/ContactStrip.astro';
 import { identity } from '../data/identity';
+import { pageSchema, serializeSchema, type PageType, type SchemaEntity } from '../lib/seo';
 interface Props {
   title?: string;
   description?: string;
   socialImage?: string;
+  noindex?: boolean;
+  pageType?: PageType;
+  mainEntity?: string;
+  schema?: SchemaEntity[];
 }
 const {
   title = 'Adrian Rusu — Android Automotive Engineer',
   description = 'Senior Android / AAOS Engineer. Automotive media, performance engineering, and systems exploration through Kotlin, Rust, and C++.',
   socialImage = '/images/social-card.png',
+  noindex = false,
+  pageType = 'WebPage',
+  mainEntity,
+  schema = [],
 } = Astro.props;
 const path = Astro.url.pathname;
 const links = [
@@ -21,8 +30,15 @@ const links = [
   ['Experience', '/experience/'],
   ['About', '/about/'],
 ];
-const linkedIn = identity.linkedIn;
-const canonical = Astro.site ? new URL(path, Astro.site).href : undefined;
+const site = Astro.site ?? new URL(identity.site);
+const canonical = new URL(path, site).href;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    ...pageSchema({ site, canonical, title, description, pageType, mainEntity }),
+    ...schema,
+  ],
+};
 ---
 
 <!doctype html>
@@ -45,38 +61,27 @@ const canonical = Astro.site ? new URL(path, Astro.site).href : undefined;
         <link rel="preload" as="image" href="/images/cockpit-hero.webp" fetchpriority="high" />
       )
     }<link rel="manifest" href="/site.webmanifest" />{
-      canonical && <link rel="canonical" href={canonical} />
-    }<meta property="og:type" content="website" /><meta property="og:title" content={title} /><meta
+      !noindex && <link rel="canonical" href={canonical} />
+    }{noindex && <meta name="robots" content="noindex, follow" />}<meta
+      property="og:type"
+      content="website"
+    /><meta property="og:title" content={title} /><meta
       property="og:description"
       content={description}
-    />{canonical && <meta property="og:url" content={canonical} />}<meta
-      name="twitter:card"
-      content="summary_large_image"
-    /><meta name="twitter:title" content={title} /><meta
-      name="twitter:description"
-      content={description}
-    /><meta property="og:image" content={new URL(socialImage, Astro.site).href} /><meta
-      name="twitter:image"
-      content={new URL(socialImage, Astro.site).href}
-    /><meta property="og:image:alt" content={title} /><script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: 'Adrian Rusu',
-        jobTitle: 'Senior Android / AAOS Engineer',
-        url: Astro.site?.href,
-        email: `mailto:${identity.email}`,
-        sameAs: [linkedIn, identity.github],
-        knowsAbout: [
-          'Android Automotive',
-          'Android Media',
-          'Performance Engineering',
-          'Rust',
-          'C++',
-        ],
-      })}
-    /><slot name="head" /></head
+    /><meta property="og:site_name" content="Adrian Rusu" />{
+      !noindex && <meta property="og:url" content={canonical} />
+    }<meta name="twitter:card" content="summary_large_image" /><meta
+      name="twitter:title"
+      content={title}
+    /><meta name="twitter:description" content={description} /><meta
+      property="og:image"
+      content={new URL(socialImage, site).href}
+    /><meta name="twitter:image" content={new URL(socialImage, site).href} /><meta
+      property="og:image:alt"
+      content={title}
+    /><meta name="twitter:image:alt" content={title} />{
+      !noindex && <script type="application/ld+json" set:html={serializeSchema(structuredData)} />
+    }<slot name="head" /></head
   >
   <body
     ><a class="skip" href="#main">Skip to content</a>

@@ -16,6 +16,73 @@ const pages = [
   'resume/index.html',
   '404.html',
 ];
+
+function schemaEntities(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(
+    ([, json]) => {
+      const schema = JSON.parse(json);
+      return schema['@graph'] ?? [schema];
+    },
+  );
+}
+
+test('indexable pages connect their canonical URL, identity and page schema', () => {
+  const descriptions = new Set();
+  for (const page of pages.filter((p) => p !== '404.html')) {
+    const html = fs.readFileSync(path.join(root, page), 'utf8');
+    const canonical = `https://adrianrusu.dev/${page.replace(/index\.html$/, '')}`;
+    assert.ok(html.includes(`rel="canonical" href="${canonical}"`), page);
+    assert.doesNotMatch(html, /name="robots" content="[^"]*noindex/);
+    const description = html.match(/name="description" content="([^"]+)"/)?.[1];
+    assert.ok(description && !descriptions.has(description), page);
+    descriptions.add(description);
+    const entities = schemaEntities(html);
+    const person = entities.find((entity) => entity['@type'] === 'Person');
+    const website = entities.find((entity) => entity['@type'] === 'WebSite');
+    const webPage = entities.find((entity) => entity['@id'] === `${canonical}#webpage`);
+    assert.equal(person?.['@id'], 'https://adrianrusu.dev/#person');
+    assert.equal(website?.publisher?.['@id'], person['@id']);
+    assert.equal(webPage?.url, canonical);
+    assert.equal(webPage?.isPartOf?.['@id'], website['@id']);
+  }
+});
+
+test('project schema describes public source code and the visible breadcrumb trail', () => {
+  for (const slug of ['pandawave', 'canopy', 'canopy-api', 'cpp-mastery']) {
+    const html = fs.readFileSync(path.join(root, 'projects', slug, 'index.html'), 'utf8');
+    const entities = schemaEntities(html);
+    const source = entities.find((entity) => entity['@type'] === 'SoftwareSourceCode');
+    const article = entities.find((entity) => entity['@type'] === 'TechArticle');
+    const breadcrumb = entities.find((entity) => entity['@type'] === 'BreadcrumbList');
+    assert.ok(source?.codeRepository?.startsWith('https://github.com/adrianrusu16/'), slug);
+    assert.ok(html.includes(`href="${source.codeRepository}"`), slug);
+    assert.equal(article?.about?.['@id'], source['@id']);
+    assert.equal(article?.author?.['@id'], 'https://adrianrusu.dev/#person');
+    assert.deepEqual(
+      breadcrumb?.itemListElement.map((item) => item.position),
+      [1, 2],
+    );
+    assert.equal(breadcrumb.itemListElement[0].item, 'https://adrianrusu.dev/projects/');
+    assert.equal(breadcrumb.itemListElement[1].item, `https://adrianrusu.dev/projects/${slug}/`);
+  }
+});
+
+test('404 stays out of search and sitemap contains exactly the indexable pages', () => {
+  const html = fs.readFileSync(path.join(root, '404.html'), 'utf8');
+  assert.match(html, /name="robots" content="noindex, follow"/);
+  assert.doesNotMatch(html, /rel="canonical"/);
+  assert.equal(schemaEntities(html).length, 0);
+  const urls = [
+    ...fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g),
+  ].map((match) => match[1]);
+  assert.deepEqual(
+    urls.sort(),
+    pages
+      .filter((p) => p !== '404.html')
+      .map((p) => `https://adrianrusu.dev/${p.replace(/index\.html$/, '')}`)
+      .sort(),
+  );
+});
 test('all requested routes have distinct titles, metadata and one primary heading', () => {
   const titles = new Set();
   for (const page of pages) {

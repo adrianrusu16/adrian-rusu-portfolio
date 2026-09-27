@@ -6,6 +6,7 @@ import CaseToc from '../../components/CaseToc.astro';
 import Lightbox from '../../components/Lightbox.astro';
 import ContentLink from '../../components/ContentLink.astro';
 import { getCollection, render } from 'astro:content';
+import { projectSchema } from '../../lib/seo';
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
   return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
@@ -24,16 +25,18 @@ const firstAnchor =
 
 <BaseLayout
   title={project.data.seoTitle}
-  description={project.data.summary}
+  description={project.data.seoDescription}
   socialImage={project.data.socialImage}
+  mainEntity={new URL(`/projects/${project.id}/#article`, Astro.site).href}
+  schema={projectSchema(project, Astro.site!)}
 >
   <section class="page-intro case-intro">
     <div class="container">
-      <div class="breadcrumb">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/projects/">Projects</a><Icon name="chevron" size={14} /><span
           >{project.data.title}</span
         >
-      </div>
+      </nav>
       <span class="eyebrow">{project.data.label.toUpperCase()} / PERSONAL PROJECT</span>
       <h1>{project.data.title}<span class="title-dot">.</span></h1>
       <p class="intro-description">{project.data.subtitle}</p>
