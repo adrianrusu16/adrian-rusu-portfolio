@@ -4,7 +4,7 @@ Reviewed 25 September 2026. Visitor links use the upstream default branch; these
 
 | Project     | Public source                               | Reviewed revision                          |
 | ----------- | ------------------------------------------- | ------------------------------------------ |
-| PandaWave   | https://github.com/adrianrusu16/Media-App   | `9558e60e4d83344e52d8487c13aa24955fa24348` |
+| PandaWave   | https://github.com/adrianrusu16/PandaWave   | `9558e60e4d83344e52d8487c13aa24955fa24348` |
 | Canopy      | https://github.com/adrianrusu16/Canopy      | `596c09e4345ec6a15bbe58f33bd8b381dd8db214` |
 | C++ Mastery | https://github.com/adrianrusu16/cpp-mastery | `60e7b5813c83107dd478b35d5244ebef9ffdb728` |
 
@@ -28,7 +28,7 @@ Reviewed 25 September 2026. Visitor links use the upstream default branch; these
 
 ## PandaWave screenshot sources
 
-All paths are inside Media-App. Assets are WebP exports at 1408px and 700px widths; `src/data/screenshots.json` holds intrinsic dimensions.
+All paths are inside PandaWave. Assets are WebP exports at 1408px and 700px widths; `src/data/screenshots.json` holds intrinsic dimensions.
 
 | Asset                | Upstream path                                                                 |
 | -------------------- | ----------------------------------------------------------------------------- |
