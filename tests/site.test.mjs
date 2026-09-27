@@ -148,7 +148,7 @@ test('case studies have complete social images and unique IDs', () => {
 
 test('public source links and external-link protections survive content rendering', () => {
   for (const [slug, repo] of [
-    ['pandawave', 'Media-App'],
+    ['pandawave', 'PandaWave'],
     ['canopy', 'Canopy'],
     ['cpp-mastery', 'cpp-mastery'],
     ['canopy-api', 'canopy-api'],

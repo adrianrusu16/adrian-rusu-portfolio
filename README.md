@@ -50,7 +50,7 @@ The site is intentionally evidence-first: real PandaWave screenshots, repo-backe
 
 | Project         | Focus                                                                                  | Source                                                                  |
 | --------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **PandaWave**   | AAOS media platform: Compose, Media3, Binder/AIDL, JNI/FFI, Rust domain engine         | [adrianrusu16/Media-App](https://github.com/adrianrusu16/Media-App)     |
+| **PandaWave**   | AAOS media platform: Compose, Media3, Binder/AIDL, JNI/FFI, Rust domain engine         | [adrianrusu16/PandaWave](https://github.com/adrianrusu16/PandaWave)     |
 | **Canopy**      | Rust/Tonic control plane: identity, catalog/search, playback policy, PostgreSQL, Nginx | [adrianrusu16/Canopy](https://github.com/adrianrusu16/Canopy)           |
 | **canopy-api**  | Versioned `canopy.v1` Protobuf/gRPC contract, Buf compatibility discipline             | [adrianrusu16/canopy-api](https://github.com/adrianrusu16/canopy-api)   |
 | **C++ Mastery** | Lifetime, RAII, allocators, templates, custom containers and sanitizer-backed labs     | [adrianrusu16/cpp-mastery](https://github.com/adrianrusu16/cpp-mastery) |
@@ -169,7 +169,7 @@ Browser-level interaction and accessibility validation remains a separate follow
 
 Case-study claims are intentionally grounded in public source where possible.
 
-- PandaWave implementation evidence → [`Media-App`](https://github.com/adrianrusu16/Media-App)
+- PandaWave implementation evidence → [`PandaWave`](https://github.com/adrianrusu16/PandaWave)
 - Canopy implementation evidence → [`Canopy`](https://github.com/adrianrusu16/Canopy)
 - API-contract evidence → [`canopy-api`](https://github.com/adrianrusu16/canopy-api)
 - C++ learning-lab evidence → [`cpp-mastery`](https://github.com/adrianrusu16/cpp-mastery)
