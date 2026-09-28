@@ -16,7 +16,7 @@
 [Portfolio](https://adrianrusu.dev) ·
 [LinkedIn](https://www.linkedin.com/in/adrian-leontin-rusu/) ·
 [GitHub](https://github.com/adrianrusu16) ·
-[Email](mailto:adrianrusu016@gmail.com)
+[Email](mailto:hello@adrianrusu.dev)
 
 </div>
 
