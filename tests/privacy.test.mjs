@@ -17,7 +17,7 @@ test('privacy identifies the controller, independent analytics and visitor right
     'Your rights',
   ])
     assert.ok(content.includes(heading), `Missing privacy section: ${heading}`);
-  assert.ok(content.includes('mailto:adrianrusu016@gmail.com'));
+  assert.ok(content.includes('mailto:hello@adrianrusu.dev'));
   assert.ok(content.includes('Google Analytics settings'));
   assert.ok(!content.includes('Email links open your email application.'));
   assert.ok(!content.includes('Fonts and external links'));

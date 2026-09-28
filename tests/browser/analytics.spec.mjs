@@ -28,6 +28,37 @@ async function commands(page) {
   return page.evaluate(() => (window.dataLayer || []).map((command) => Array.from(command)));
 }
 
+test('only the primary domain email triggers contact intent after consent', async ({
+  page,
+  context,
+}) => {
+  await intercept(context);
+  await page.goto('/privacy/');
+  const email = page.locator('main a[href="mailto:hello@adrianrusu.dev"]').first();
+  await expect(email).toBeVisible();
+  await page.evaluate(() => document.addEventListener('click', (event) => event.preventDefault()));
+  await email.click();
+  expect(await commands(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await email.click();
+  await page.evaluate(() => {
+    for (const address of [
+      'unrelated@example.org',
+      'adrianrusu016@gmail.com',
+      'contact@adrianrusu.dev',
+      'hi@adrianrusu.dev',
+    ]) {
+      const link = document.createElement('a');
+      link.href = `mailto:${address}`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+    }
+  });
+  const events = (await commands(page)).filter((command) => command[0] === 'event');
+  expect(events.map((command) => command[1])).toEqual(['contact_email_click']);
+});
+
 test('fresh and denied visitors make no analytics requests across pages', async ({
   page,
   context,
