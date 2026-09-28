@@ -14,6 +14,7 @@ const pages = [
   'experience/index.html',
   'about/index.html',
   'resume/index.html',
+  'privacy/index.html',
   '404.html',
 ];
 

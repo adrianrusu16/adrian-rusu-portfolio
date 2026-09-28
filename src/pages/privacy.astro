@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { identity } from '../data/identity';
+---
+
+<BaseLayout
+  title="Privacy — Adrian Rusu"
+  description="How this portfolio handles optional Google Analytics, your locally saved consent preference, and contact links. Change your analytics choice at any time."
+>
+  <section class="page-intro container">
+    <span class="eyebrow">YOUR CHOICE</span>
+    <h1>Privacy</h1>
+    <p class="intro-description">
+      This portfolio has no advertising. I do not sell visitor information. Optional analytics helps
+      me understand how people find and use my work.
+    </p>
+  </section>
+  <section class="section container privacy-content">
+    <div class="prose">
+      <h2>Optional Google Analytics</h2>
+      <p>
+        Google Analytics loads only when you choose “Allow analytics.” If you decline, this site
+        does not load the Google Analytics tag or send it analytics requests. Advertising storage,
+        advertising personalization and Google Signals are disabled.
+      </p>
+      <p>
+        When allowed, Google Analytics can measure page views, broad traffic sources, device and
+        browser information, and interactions with the portfolio. It uses first-party cookies to
+        help distinguish visits. Google processes this information under its <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer">privacy policy</a
+        >.
+      </p>
+      <h2>What this portfolio measures</h2>
+      <p>
+        The site records clicks on email, LinkedIn, the résumé PDF and public project source links
+        after you allow analytics. These custom events include the public page path and, for project
+        links, the project name used in its URL. They do not include your email address, message
+        text, full link text, or URL query strings and fragments.
+      </p>
+      <p>
+        Google Analytics may also record standard engagement, outbound-click and file-download
+        events according to the property's settings. The named portfolio events distinguish useful
+        actions from those general measurements.
+      </p>
+      <h2>Your analytics preference</h2>
+      <p>
+        Your choice is saved in this browser's local storage as <code>ar_analytics_consent</code>.
+        It is not an account-wide setting. You can allow or decline analytics at any time using the
+        settings control below or in the footer.
+      </p>
+      <p>
+        Withdrawing consent disables tracking, removes this site's accessible Google Analytics
+        cookies and reloads the page without the tag. This stops future collection from this
+        browser; it does not erase information already sent to Google. Clearing browser storage
+        removes your saved choice.
+      </p>
+      <button
+        class="privacy-settings"
+        type="button"
+        data-analytics-settings
+        aria-controls="analytics-consent"
+        aria-expanded="false">Analytics settings</button
+      >
+      <noscript
+        ><p>
+          JavaScript is disabled, so Google Analytics does not load and no analytics preference is
+          needed.
+        </p></noscript
+      >
+      <h2>Cloudflare Web Analytics</h2>
+      <p>
+        Cloudflare Web Analytics is a separate service for aggregate traffic and performance
+        measurement. I have not confirmed active collection on this site, and this portfolio does
+        not add its tracking script. It is not controlled by the optional Google Analytics
+        preference.
+      </p>
+      <h2>Fonts and external links</h2>
+      <p>
+        This site currently loads its fonts from Google Fonts, independently of the analytics
+        choice. Following a link to GitHub, LinkedIn or another website takes you to a service with
+        its own privacy practices. Email links open your email application.
+      </p>
+      <h2>Contact</h2>
+      <p>
+        For questions about this portfolio or its analytics, email <a
+          href={`mailto:${identity.email}`}>{identity.email}</a
+        >.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .privacy-content {
+    padding-top: 0;
+  }
+  .prose {
+    max-width: 760px;
+  }
+  .privacy-settings {
+    padding: 0.65rem 1rem;
+    min-height: 44px;
+    border: 1px solid var(--accent-light);
+    border-radius: 4px;
+    background: var(--surface);
+    cursor: pointer;
+    margin-block: 1rem;
+  }
+</style>

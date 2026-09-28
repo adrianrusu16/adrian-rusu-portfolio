@@ -5,3 +5,7 @@ node_modules
 # Local assistant state is not part of the website source.
 .serena
 pnpm-lock.yaml
+
+# Browser test output
+test-results/
+playwright-report/
