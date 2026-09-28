@@ -51,10 +51,10 @@ import { identity } from '../data/identity';
         settings control below or in the footer.
       </p>
       <p>
-        Withdrawing consent disables tracking, removes this site's accessible Google Analytics
-        cookies and reloads the page without the tag. This stops future collection from this
-        browser; it does not erase information already sent to Google. Clearing browser storage
-        removes your saved choice.
+        Withdrawing Google Analytics consent disables Google tracking, removes this site's
+        accessible Google Analytics cookies and reloads the page without the Google tag. This stops
+        future Google Analytics collection from this browser; it does not erase information already
+        sent to Google. Clearing browser storage removes your saved choice.
       </p>
       <button
         class="privacy-settings"
@@ -71,10 +71,15 @@ import { identity } from '../data/identity';
       >
       <h2>Cloudflare Web Analytics</h2>
       <p>
-        Cloudflare Web Analytics is a separate service for aggregate traffic and performance
-        measurement. I have not confirmed active collection on this site, and this portfolio does
-        not add its tracking script. It is not controlled by the optional Google Analytics
-        preference.
+        Cloudflare Web Analytics is enabled through one manually installed beacon for aggregate
+        traffic and real-user page performance measurement. It runs separately from optional Google
+        Analytics: declining Google Analytics does not disable the Cloudflare beacon. See
+        <a
+          href="https://developers.cloudflare.com/web-analytics/about/"
+          target="_blank"
+          rel="noopener noreferrer">Cloudflare's explanation of Web Analytics</a
+        >
+        for more about the service.
       </p>
       <h2>Fonts and external links</h2>
       <p>

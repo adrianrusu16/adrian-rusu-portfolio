@@ -2,6 +2,12 @@ import { test, expect } from '@playwright/test';
 const key = 'ar_analytics_consent';
 async function intercept(context) {
   const requests = [];
+  await context.route('https://static.cloudflareinsights.com/**', (route) =>
+    route.fulfill({ contentType: 'application/javascript', body: '' }),
+  );
+  await context.route('https://cloudflareinsights.com/**', (route) =>
+    route.fulfill({ status: 204 }),
+  );
   context.on('request', (request) => {
     if (/googletagmanager|google-analytics/.test(request.url())) requests.push(request.url());
   });
