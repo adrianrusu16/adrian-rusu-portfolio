@@ -5,94 +5,100 @@ import { identity } from '../data/identity';
 
 <BaseLayout
   title="Privacy — Adrian Rusu"
-  description="How this portfolio handles optional Google Analytics, your locally saved consent preference, and contact links. Change your analytics choice at any time."
+  description="How adrianrusu.dev uses Cloudflare Web Analytics and optional Google Analytics, including consent controls and privacy information."
 >
   <section class="page-intro container">
-    <span class="eyebrow">YOUR CHOICE</span>
+    <span class="eyebrow">PRIVACY INFORMATION</span>
     <h1>Privacy</h1>
     <p class="intro-description">
-      This portfolio has no advertising. I do not sell visitor information. Optional analytics helps
-      me understand how people find and use my work.
+      This portfolio has no advertising. I do not sell visitor information.
     </p>
   </section>
   <section class="section container privacy-content">
     <div class="prose">
-      <h2>Optional Google Analytics</h2>
+      <h2>Controller and contact details</h2>
       <p>
-        Google Analytics loads only when you choose “Allow analytics.” If you decline, this site
-        does not load the Google Analytics tag or send it analytics requests. Advertising storage,
-        advertising personalization and Google Signals are disabled.
-      </p>
-      <p>
-        When allowed, Google Analytics can measure page views, broad traffic sources, device and
-        browser information, and interactions with the portfolio. It uses first-party cookies to
-        help distinguish visits. Google processes this information under its <a
-          href="https://policies.google.com/privacy"
-          target="_blank"
-          rel="noopener noreferrer">privacy policy</a
+        Adrian Rusu operates this site and is responsible for its personal-data processing. Contact: <a
+          href={`mailto:${identity.email}`}>{identity.email}</a
         >.
       </p>
-      <h2>What this portfolio measures</h2>
+
+      <h2>Analytics used on this site</h2>
+      <h3>Cloudflare Web Analytics</h3>
       <p>
-        The site records clicks on email, LinkedIn, the résumé PDF and public project source links
-        after you allow analytics. These custom events include the public page path and, for project
-        links, the project name used in its URL. They do not include your email address, message
-        text, full link text, or URL query strings and fragments.
+        One manual beacon measures aggregate traffic and real-user page performance through
+        <a
+          href="https://developers.cloudflare.com/web-analytics/about/"
+          target="_blank"
+          rel="noopener noreferrer">Cloudflare Web Analytics</a
+        >. It runs separately from optional Google Analytics: declining Google Analytics does not
+        disable it.
       </p>
+      <h3>Optional Google Analytics</h3>
       <p>
-        Google Analytics may also record standard engagement, outbound-click and file-download
-        events according to the property's settings. The named portfolio events distinguish useful
-        actions from those general measurements.
+        Google Analytics loads only after you choose “Allow analytics”; declining keeps the Google
+        tag unloaded. Advertising storage, advertising personalization and Google Signals stay
+        disabled. See <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer">Google’s privacy policy</a
+        >.
       </p>
-      <h2>Your analytics preference</h2>
+
+      <h2>What Google Analytics measures</h2>
       <p>
-        Your choice is saved in this browser's local storage as <code>ar_analytics_consent</code>.
-        It is not an account-wide setting. You can allow or decline analytics at any time using the
-        settings control below or in the footer.
+        With permission, Google Analytics uses first-party cookies to measure page views, traffic
+        sources, device/browser information and engagement. Custom events record clicks on email,
+        LinkedIn, public project source links, and links that open or download the résumé PDF. They
+        exclude email message contents, full link text, URL query strings and fragments.
       </p>
+
+      <h2>Your Google Analytics choice</h2>
       <p>
-        Withdrawing Google Analytics consent disables Google tracking, removes this site's
-        accessible Google Analytics cookies and reloads the page without the Google tag. This stops
-        future Google Analytics collection from this browser; it does not erase information already
-        sent to Google. Clearing browser storage removes your saved choice.
+        Allow, decline or withdraw through Google Analytics settings below or in the footer. Your
+        preference stays in this browser until you change it or clear browser storage. Withdrawal
+        clears accessible Google Analytics cookies and reloads without the Google tag; it does not
+        erase data already sent.
+      </p>
+
+      <h2>Other third-party resources</h2>
+      <p>
+        DM Sans and IBM Plex Mono load from Google Fonts, separately from your Google Analytics
+        choice.
+      </p>
+
+      <h2>Retention and recipients</h2>
+      <p>
+        Google receives Google Analytics data. This property’s event-data retention is set to two
+        months, with user-data retention reset on new activity. This limit does not apply to
+        standard aggregated reports. Cloudflare receives Web Analytics data; its <a
+          href="https://developers.cloudflare.com/web-analytics/faq/"
+          target="_blank"
+          rel="noopener noreferrer">documentation</a
+        >
+        describes seven days of unsampled data and access to reports for the previous six months.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        Where applicable, you may request access, correction, erasure, restriction or portability of
+        personal data, object to processing, and withdraw consent. Contact <a
+          href={`mailto:${identity.email}`}>{identity.email}</a
+        >. You may also complain to a competent data-protection authority, including Romania’s
+        <a
+          href="https://www.dataprotection.ro/?lang=ro&page=Plangeri_meniu"
+          target="_blank"
+          rel="noopener noreferrer">ANSPDCP</a
+        >.
       </p>
       <button
         class="privacy-settings"
         type="button"
         data-analytics-settings
         aria-controls="analytics-consent"
-        aria-expanded="false">Analytics settings</button
+        aria-expanded="false">Google Analytics settings</button
       >
-      <noscript
-        ><p>
-          JavaScript is disabled, so Google Analytics does not load and no analytics preference is
-          needed.
-        </p></noscript
-      >
-      <h2>Cloudflare Web Analytics</h2>
-      <p>
-        Cloudflare Web Analytics is enabled through one manually installed beacon for aggregate
-        traffic and real-user page performance measurement. It runs separately from optional Google
-        Analytics: declining Google Analytics does not disable the Cloudflare beacon. See
-        <a
-          href="https://developers.cloudflare.com/web-analytics/about/"
-          target="_blank"
-          rel="noopener noreferrer">Cloudflare's explanation of Web Analytics</a
-        >
-        for more about the service.
-      </p>
-      <h2>Fonts and external links</h2>
-      <p>
-        This site currently loads its fonts from Google Fonts, independently of the analytics
-        choice. Following a link to GitHub, LinkedIn or another website takes you to a service with
-        its own privacy practices. Email links open your email application.
-      </p>
-      <h2>Contact</h2>
-      <p>
-        For questions about this portfolio or its analytics, email <a
-          href={`mailto:${identity.email}`}>{identity.email}</a
-        >.
-      </p>
+      <noscript><p>JavaScript is disabled, so Google Analytics does not load.</p></noscript>
     </div>
   </section>
 </BaseLayout>

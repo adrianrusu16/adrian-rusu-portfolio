@@ -40,4 +40,18 @@ test('one Cloudflare beacon loads independently while GA4 remains denied', async
   await expect(page.locator('script[data-cf-beacon]')).toHaveCount(1);
   await expect(page.locator('#analytics-consent')).toBeHidden();
   expect(googleRequests).toEqual([]);
+  await page.locator('main [data-analytics-settings]').click();
+  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await expect.poll(() => googleRequests.length).toBe(1);
+  await expect(page.locator('script[data-cf-beacon]')).toHaveCount(1);
+  expect(cloudflareLoads).toBe(2);
+  await page.locator('main [data-analytics-settings]').click();
+  await Promise.all([
+    page.waitForEvent('load'),
+    page.getByRole('button', { name: 'No thanks', exact: true }).click(),
+  ]);
+  await expect.poll(() => cloudflareLoads).toBe(3);
+  await expect(page.locator('script[data-cf-beacon]')).toHaveCount(1);
+  expect(googleRequests).toHaveLength(1);
+  expect(await page.evaluate(() => window.__cloudflareLoaded)).toBe(true);
 });

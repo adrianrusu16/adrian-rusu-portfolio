@@ -141,7 +141,7 @@ test('intent events only send allowlisted public metadata with consent', () => {
   browser.api.choose('granted');
   for (const name of [
     'contact_email_click',
-    'resume_download',
+    'resume_pdf_click',
     'linkedin_click',
     'project_source_click',
   ])
@@ -155,7 +155,7 @@ test('intent events only send allowlisted public metadata with consent', () => {
     'pandawave',
   );
   browser.storage.set('ar_analytics_consent', 'denied');
-  browser.api.track('resume_download');
+  browser.api.track('resume_pdf_click');
   assert.deepEqual(browser.commands(), []);
 });
 
