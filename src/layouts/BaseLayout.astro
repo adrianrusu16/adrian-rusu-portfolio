@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/evidence.css';
 import Icon from '../components/Icon.astro';
 import AnalyticsConsent from '../components/AnalyticsConsent.astro';
+import CloudflareAnalytics from '../components/CloudflareAnalytics.astro';
 import ContactStrip from '../components/ContactStrip.astro';
 import { identity } from '../data/identity';
 import { pageSchema, serializeSchema, type PageType, type SchemaEntity } from '../lib/seo';
@@ -82,7 +83,7 @@ const structuredData = {
       content={title}
     /><meta name="twitter:image:alt" content={title} />{
       !noindex && <script type="application/ld+json" set:html={serializeSchema(structuredData)} />
-    }<slot name="head" /></head
+    }<CloudflareAnalytics /><slot name="head" /></head
   >
   <body
     ><a class="skip" href="#main">Skip to content</a>

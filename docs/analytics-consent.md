@@ -15,7 +15,7 @@ Base main: `b32e2d31a95d5806ec425a39a6176e72215abe98`
 - Four events: `contact_email_click`, `resume_download`, `linkedin_click`, `project_source_click`. Only public page paths and project slugs enter custom parameters. Destination queries, fragments, link text and email addresses are excluded.
 - Project repositories/slugs come from the existing typed Markdown collection, not a second hard-coded project inventory.
 - `/privacy/` is indexable and joins the sitemap (ten canonical URLs). Existing canonical/schema metadata is preserved.
-- Cloudflare remains separate. After the owner added Account Settings Read, Web Analytics API access succeeded. The existing domain entry is enabled with automatic installation, but apex DNS records are DNS-only and live browser inspection found no beacon requests. Cloudflare documents that automatic injection requires proxying; a manual beacon needs separate approval. No beacon is added in this revision. SEOMonster 0.9.3 misses the host because the API places it in ruleset.zone_name; the underlying read-only client confirms the existing entry.
+- Cloudflare Web Analytics uses one global manual beacon with the existing domain site configuration. It is independent of the GA4 consent preference; declining Google Analytics leaves Cloudflare enabled. DNS-only mode is retained. No Cloudflare site, token, account setting or proxy configuration was created or changed. See [Cloudflare implementation](cloudflare-analytics.md).
 - Current Google Fonts requests are disclosed independently of optional analytics; update that section when the separate font phase removes them.
 
 ## Validation
@@ -50,4 +50,4 @@ The real Google tag was additionally loaded in a local browser with GA collectio
 
 Review limitations: real production provider behavior and Cloudflare account state remain post-publication checks. Pending-script withdrawal is covered separately with a delayed response. No other review findings were deferred.
 
-Cloudflare setup reference: [automatic injection and DNS-only domains](https://developers.cloudflare.com/web-analytics/faq/). The permission issue is resolved; active collection is still unverified.
+Cloudflare setup reference: [automatic injection and DNS-only domains](https://developers.cloudflare.com/web-analytics/faq/). The permission issue is resolved. The manual beacon is implemented; dashboard receipt must be checked after approved publication.
