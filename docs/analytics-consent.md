@@ -15,7 +15,7 @@ Base main: `b32e2d31a95d5806ec425a39a6176e72215abe98`
 - Four events: `contact_email_click`, `resume_download`, `linkedin_click`, `project_source_click`. Only public page paths and project slugs enter custom parameters. Destination queries, fragments, link text and email addresses are excluded.
 - Project repositories/slugs come from the existing typed Markdown collection, not a second hard-coded project inventory.
 - `/privacy/` is indexable and joins the sitemap (ten canonical URLs). Existing canonical/schema metadata is preserved.
-- Cloudflare remains separate. No beacon is added. Live browser inspection found no beacon requests; API configuration and dashboard collection remain unverified because `cf_web_analytics` returns HTTP 403.
+- Cloudflare remains separate. After the owner added Account Settings Read, Web Analytics API access succeeded. The existing domain entry is enabled with automatic installation, but apex DNS records are DNS-only and live browser inspection found no beacon requests. Cloudflare documents that automatic injection requires proxying; a manual beacon needs separate approval. No beacon is added in this revision. SEOMonster 0.9.3 misses the host because the API places it in ruleset.zone_name; the underlying read-only client confirms the existing entry.
 - Current Google Fonts requests are disclosed independently of optional analytics; update that section when the separate font phase removes them.
 
 ## Validation
@@ -26,7 +26,7 @@ Browser regressions: `pnpm test:browser` after building. Install Playwright Chro
 
 Browser tests intercept the Google script and collection endpoints to avoid polluting the production property. They verify the request boundary, queued configuration/events, persistence, withdrawal, cross-tab behavior, mobile controls and storage failures. They do not claim successful delivery to GA4. Realtime/DebugView and production reject/allow checks must follow separately approved publication.
 
-Enhanced Measurement and key-event account settings were not changed. Provider standard `click` / `file_download` events differ from the explicit portfolio intent events; do not count their sum as unique actions. The requested recommended key events remain an owner configuration task: email, rÃ©sumÃ© and LinkedIn.
+Enhanced Measurement and key-event account settings were not changed. Provider standard `click` / `file_download` events differ from the explicit portfolio intent events; do not count their sum as unique actions. The requested recommended key events remain an owner configuration task: email, résumé and LinkedIn.
 
 ## Supporting documentation
 
@@ -49,3 +49,5 @@ The independent review found a failed repeat Allow write could leave already loa
 The real Google tag was additionally loaded in a local browser with GA collection intercepted. It initialized once, emitted a page view and intent/standard event requests, and used the canonical page URL without the test query or fragment. No test collection traffic was sent to the production property. This does not establish Realtime/DebugView receipt or dashboard configuration.
 
 Review limitations: real production provider behavior and Cloudflare account state remain post-publication checks. Pending-script withdrawal is covered separately with a delayed response. No other review findings were deferred.
+
+Cloudflare setup reference: [automatic injection and DNS-only domains](https://developers.cloudflare.com/web-analytics/faq/). The permission issue is resolved; active collection is still unverified.
