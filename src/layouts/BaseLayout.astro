@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import '../styles/evidence.css';
 import Icon from '../components/Icon.astro';
+import AnalyticsConsent from '../components/AnalyticsConsent.astro';
 import ContactStrip from '../components/ContactStrip.astro';
 import { identity } from '../data/identity';
 import { pageSchema, serializeSchema, type PageType, type SchemaEntity } from '../lib/seo';
@@ -147,7 +148,20 @@ const structuredData = {
           >
         </div>
       </div>
+      <div class="container analytics-footer">
+        <a href="/privacy/">Privacy</a>
+        <button
+          type="button"
+          data-analytics-settings
+          aria-controls="analytics-consent"
+          aria-expanded="false">Analytics settings</button
+        >
+      </div>
     </footer>
+    <AnalyticsConsent
+      title={title}
+      canonical={noindex ? new URL('/404.html', site).href : canonical}
+    />
     <script>
       const trigger = document.querySelector<HTMLButtonElement>('.menu-button');
       const menu = document.querySelector<HTMLElement>('#mobile-nav');
@@ -175,3 +189,27 @@ const structuredData = {
     </script>
   </body>
 </html>
+
+<style>
+  .analytics-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block: 0 2rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .analytics-footer button {
+    background: none;
+    border: 0;
+    padding: 0.5rem 0;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .analytics-footer a {
+    padding: 0.5rem 0;
+  }
+</style>
