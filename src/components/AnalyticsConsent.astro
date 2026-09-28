@@ -28,9 +28,10 @@ const config = {
   hidden
 >
   <div>
-    <h2 id="analytics-title">Optional analytics</h2>
+    <h2 id="analytics-title">Optional Google Analytics</h2>
     <p>
-      With your permission, I use Google Analytics to understand how visitors find and use this
+      Cloudflare Web Analytics measures aggregate traffic and site performance. With your
+      permission, I also use Google Analytics to understand how visitors find and use this
       portfolio. Advertising features stay off.
     </p>
     <p class="consent-status" role="status" aria-live="polite"></p>
@@ -75,8 +76,8 @@ const config = {
         opener = button;
         status.textContent =
           analytics.preference() === 'granted'
-            ? 'Analytics is currently allowed.'
-            : 'Analytics is currently off.';
+            ? 'Google Analytics is currently allowed.'
+            : 'Google Analytics is currently off.';
         show(true);
         panel.querySelector<HTMLButtonElement>('[data-consent]')?.focus();
       }),
@@ -87,7 +88,7 @@ const config = {
         if (!saved) {
           show(true);
           status.textContent =
-            'Analytics is off for this page. Your browser could not save this choice. Check your browser storage settings to remember it.';
+            'Google Analytics is off for this page. Your browser could not save this choice. Check your browser storage settings to remember it.';
           return;
         }
         show(false);
@@ -104,7 +105,7 @@ const config = {
       if (url.protocol === 'mailto:' && url.pathname === config.email)
         analytics.track('contact_email_click');
       else if (url.origin === location.origin && url.pathname === config.resume)
-        analytics.track('resume_download');
+        analytics.track('resume_pdf_click');
       else if (clean === config.linkedIn.replace(/\/$/, '')) analytics.track('linkedin_click');
       else {
         const project = config.projects.find(

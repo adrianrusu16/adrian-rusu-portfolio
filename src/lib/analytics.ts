@@ -1,5 +1,6 @@
 export type Consent = 'granted' | 'denied';
-type Intent = 'contact_email_click' | 'resume_download' | 'linkedin_click' | 'project_source_click';
+type Intent =
+  'contact_email_click' | 'resume_pdf_click' | 'linkedin_click' | 'project_source_click';
 interface AnalyticsOptions {
   pageLocation: string;
   pageTitle: string;
@@ -19,7 +20,7 @@ const KEY = 'ar_analytics_consent';
 const adConsent = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
 const intents: readonly string[] = [
   'contact_email_click',
-  'resume_download',
+  'resume_pdf_click',
   'linkedin_click',
   'project_source_click',
 ];

@@ -34,7 +34,7 @@ test('fresh and denied visitors make no analytics requests across pages', async 
 }) => {
   const requests = await intercept(context);
   await page.goto('/');
-  await expect(page.getByRole('region', { name: 'Optional analytics' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Optional Google Analytics' })).toBeVisible();
   expect(requests).toEqual([]);
   await page.getByRole('button', { name: 'No thanks', exact: true }).click();
   await expect(page.locator('#analytics-consent')).toBeHidden();
@@ -88,7 +88,7 @@ test('grant loads once, keeps ads denied, and queues only sanitized intent event
   expect(events.map((c) => c[1])).toEqual([
     'contact_email_click',
     'linkedin_click',
-    'resume_download',
+    'resume_pdf_click',
     'project_source_click',
   ]);
   expect(JSON.stringify(queue)).not.toMatch(/private|secret|email=|#private/);
@@ -204,3 +204,66 @@ test('withdrawal while the tag request is pending leaves the new page untracked'
   expect(await commands(page)).toEqual([]);
   expect(await page.evaluate(() => window.__lateTag)).toBeUndefined();
 });
+
+test('all résumé PDF links use the PDF-click event without claiming a completed download', async ({
+  page,
+  context,
+}) => {
+  await intercept(context);
+  await page.goto('/resume/');
+  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  const selectors = [
+    'main a[download]',
+    'main .resume-actions a[target="_blank"]',
+    'footer a[href="/adrian-rusu-resume.pdf"]',
+  ];
+  await page.evaluate((selectors) => {
+    document.addEventListener('click', (event) => event.preventDefault());
+    for (const selector of selectors) document.querySelector(selector).click();
+  }, selectors);
+  const events = (await commands(page)).filter((command) => command[0] === 'event');
+  expect(events.map((command) => command[1])).toEqual(Array(3).fill('resume_pdf_click'));
+});
+
+for (const viewport of [
+  { width: 1440, height: 1000 },
+  { width: 390, height: 844 },
+]) {
+  test(`privacy controls and content remain usable at ${viewport.width}px`, async ({
+    page,
+    context,
+  }) => {
+    const requests = await intercept(context);
+    await page.setViewportSize(viewport);
+    await page.goto('/privacy/');
+    await expect(
+      page.getByRole('region', { name: 'Optional Google Analytics', exact: true }),
+    ).toBeVisible();
+    expect(requests).toEqual([]);
+    await expect(page.locator('#analytics-consent')).toContainText('Cloudflare Web Analytics');
+    await page.getByRole('button', { name: 'No thanks', exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Controller and contact details' }),
+    ).toBeVisible();
+    const settings = page
+      .locator('main')
+      .getByRole('button', { name: 'Google Analytics settings', exact: true });
+    await expect(settings).toBeVisible();
+    await expect(
+      page
+        .locator('footer')
+        .getByRole('button', { name: 'Google Analytics settings', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Analytics settings', exact: true })).toHaveCount(
+      0,
+    );
+    await settings.click();
+    await expect(page.getByRole('status')).toHaveText('Google Analytics is currently off.');
+    await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+    await expect.poll(() => requests.length).toBe(1);
+    await expect(settings).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+}
