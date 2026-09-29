@@ -10,8 +10,8 @@ Before merging, the owner must confirm that all three planned routes are active 
 
 ## Résumé follow-up
 
-The current two-page PDF retains its previous Gmail contact address in visible text and a mailto annotation. No editable PDF source or established PDF-generation workflow was found in this repository. The PDF is unchanged; its still-valid address remains a temporary alternate contact. Replace it through the original résumé authoring workflow in a separate update.
+The two-page PDF now uses the owner's final export with `hello@adrianrusu.dev` in visible text and its mailto annotation. The previous Gmail contact is removed from both. The public PDF path is unchanged. See [the canonical résumé and source-workflow status](resume.md).
 
 ## Verification
 
-Generated HTML must contain the domain contact link and exclude the forwarding destination and inbound aliases. Browser coverage verifies the domain email triggers `contact_email_click` only after consent and unrelated mailto addresses do not. Binary PDF content is intentionally outside the HTML assertion.
+Generated HTML must contain the domain contact link and exclude the forwarding destination and inbound aliases. Browser coverage verifies the domain email triggers `contact_email_click` only after consent and unrelated mailto addresses do not. PDF text, annotations and layout are validated separately; résumé tests protect the validated export and its open/download integration.
