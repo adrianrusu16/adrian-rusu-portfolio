@@ -18,6 +18,16 @@ test('privacy identifies the controller, independent analytics and visitor right
     assert.ok(content.includes(heading), `Missing privacy section: ${heading}`);
   assert.ok(content.includes('mailto:hello@adrianrusu.dev'));
   assert.ok(content.includes('Google Analytics settings'));
+  const text = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  assert.ok(text.includes('Where applicable'));
+  assert.ok(text.includes('withdraw consent'));
+  assert.ok(text.includes('For privacy requests'));
+  assert.ok(text.includes('right to lodge a complaint'));
+  assert.match(
+    content,
+    /<a\b[^>]*href="https:\/\/www\.dataprotection\.ro\/\?lang=ro(?:&amp;|&)page=Plangeri_meniu"[^>]*>\s*data-protection supervisory(?:\s|&nbsp;|&#160;)authority\s*<\/a>/,
+  );
+  assert.ok(!text.includes('You may also complain to a competent data-protection authority'));
   assert.ok(!content.includes('Email links open your email application.'));
   assert.ok(!content.includes('Fonts and external links'));
   assert.ok(!content.includes('ar_analytics_consent'));

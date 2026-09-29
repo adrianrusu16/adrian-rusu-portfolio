@@ -6,6 +6,8 @@ The privacy page identifies Adrian Rusu as controller, distinguishes Cloudflare 
 
 Google-only control and status labels avoid implying that declining Google Analytics disables all measurement. The consent storage, tag initialization, advertising denial, Google Signals setting, revocation, cookie clearing and Cloudflare beacon are unchanged.
 
+The rights section uses neutral supervisory-authority language: visitors are informed of their right to lodge a complaint without framing the notice as an invitation to report the site. “For privacy requests” clarifies the contact path while preserving the “Where applicable” qualification.
+
 ## Verified information — 28 September 2026
 
 - Existing authorized read-only Google Analytics Admin API request `properties.getDataRetentionSettings` returned HTTP 200: `eventDataRetention=TWO_MONTHS` and `resetUserDataOnNewActivity=true`. No account configuration was changed. [Google explains](https://support.google.com/analytics/answer/7667196?hl=en) that reset applies to user-level data and standard aggregated reports are outside this retention limit.
