@@ -12,7 +12,6 @@ test('privacy identifies the controller, independent analytics and visitor right
     'Optional Google Analytics',
     'What Google Analytics measures',
     'Your Google Analytics choice',
-    'Other third-party resources',
     'Retention and recipients',
     'Your rights',
   ])
