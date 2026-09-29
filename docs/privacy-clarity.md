@@ -2,7 +2,7 @@
 
 Branch: `fix/privacy-clarity`. Base: `97b4154b5361533eb21658f07a3f6e45a7f38ffe`.
 
-The privacy page identifies Adrian Rusu as controller, distinguishes Cloudflare measurement from optional Google Analytics, and adds named recipients, retention information and conditional privacy rights. The generic contact and external-link explanations are removed. Remote DM Sans and IBM Plex Mono remain disclosed until the separate font-hosting change.
+The privacy page identifies Adrian Rusu as controller, distinguishes Cloudflare measurement from optional Google Analytics, and adds named recipients, retention information and conditional privacy rights. The generic contact and external-link explanations are removed. DM Sans and IBM Plex Mono are now self-hosted; the obsolete Google Fonts section is removed. See [font implementation and measurements](fonts.md).
 
 Google-only control and status labels avoid implying that declining Google Analytics disables all measurement. The consent storage, tag initialization, advertising denial, Google Signals setting, revocation, cookie clearing and Cloudflare beacon are unchanged.
 

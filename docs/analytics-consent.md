@@ -18,7 +18,7 @@ Base main: `b32e2d31a95d5806ec425a39a6176e72215abe98`
 - Project repositories/slugs come from the existing typed Markdown collection, not a second hard-coded project inventory.
 - `/privacy/` is indexable and joins the sitemap (ten canonical URLs). Existing canonical/schema metadata is preserved.
 - Cloudflare Web Analytics uses one global manual beacon with the existing domain site configuration. It is independent of the GA4 consent preference; declining Google Analytics leaves Cloudflare enabled. DNS-only mode is retained. No Cloudflare site, token, account setting or proxy configuration was created or changed. See [Cloudflare implementation](cloudflare-analytics.md).
-- Current Google Fonts requests are disclosed independently of optional analytics; update that section when the separate font phase removes them.
+- Fonts are served locally with no Google Fonts requests. The obsolete font-provider disclosure is removed; optional Google Analytics and independent Cloudflare measurement are unchanged. See [font implementation](fonts.md).
 
 ## Validation
 
