@@ -1,6 +1,6 @@
 # Canonical résumé
 
-Last updated: 29 September 2026. Primary public email: `hello@adrianrusu.dev`.
+Last updated: 30 September 2026. Primary public email: `hello@adrianrusu.dev`.
 
 The canonical public export is `public/adrian-rusu-resume.pdf`, served at `/adrian-rusu-resume.pdf`. Open, Download and footer links consume `identity.resume`; the `resume_pdf_click` event and consent behavior are unchanged.
 
@@ -8,9 +8,20 @@ The canonical public export is `public/adrian-rusu-resume.pdf`, served at `/adri
 
 This update uses the owner's supplied `Adrian_Rusu_Android_AAOS_CV_2026_Final_Hello.pdf` unchanged. It supersedes the older filename referenced in the implementation plan. Its metadata identifies LibreOffice Writer 25.2.3.2 as the exporter. No PDF internals were edited, no content was recreated, and no pages were flattened.
 
-The editable Word/Writer source was not found in the repository or the supplied files. Its location has been requested from the owner and is not yet verified. Do not describe this repository as having a reproducible authoring source until that document is supplied or its maintained location is confirmed. Keep private local paths out of committed documentation. This remains an open publication-gate item in the supplied plan.
+The canonical source for this release is `public/adrian-rusu-resume.pdf`. The editable Word/Writer source is unavailable / not recovered. On 30 September 2026, the owner accepted this as a maintenance limitation and explicitly removed editable-source recovery as a publication requirement. Preserve the canonical PDF unchanged; do not reconstruct or reverse-engineer an editable source from it. Keep private local paths out of committed documentation.
 
-For the next update, edit the owner's original Word/Writer document and export it once as a two-page text PDF with hyperlinks preserved. Validate the export, then copy those exact bytes to `public/adrian-rusu-resume.pdf`. The recruiter copy may be named `Adrian_Rusu_Android_AAOS_CV_2026.pdf`; make it a copy of the same export, never a separately edited document.
+Future edits must either locate the original authoring source or establish a new reproducible source workflow. This release does not authorize rebuilding the résumé. For an approved future update, export once as a two-page text PDF with hyperlinks preserved. Validate the export, then copy those exact bytes to `public/adrian-rusu-resume.pdf`. The recruiter copy may be named `Adrian_Rusu_Android_AAOS_CV_2026.pdf`; make it a copy of the same export, never a separately edited document.
+
+## Release checklist
+
+- [x] Canonical source for this release: `public/adrian-rusu-resume.pdf`.
+- [x] Editable source: unavailable / not recovered; owner accepts the maintenance limitation.
+- [x] Canonical PDF retained unchanged with two pages, selectable text, `hello@adrianrusu.dev` and its clickable email link.
+- [x] Stable `/adrian-rusu-resume.pdf` path, résumé analytics behavior and byte-identical recruiter copy retained.
+- [x] Site version 12 saved as an unpublished candidate from main `38989ec1275c8e21212d88f3e599ae62d4632e5b`.
+- [ ] Final owner approval of the release preview before publication.
+
+Editable-source recovery is not a publication blocker. Keep Site version 12 unpublished until final preview approval. This documentation update does not replace or publish that candidate. If documentation changes are later merged, reconcile the release candidate with the final main revision before publication; version 12 retains the source revision recorded above.
 
 ## Validated export
 
