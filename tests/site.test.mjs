@@ -33,6 +33,28 @@ function schemaEntities(html) {
   );
 }
 
+test('profile identity connects the full name, public brand and exact professional profiles', () => {
+  const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const about = fs.readFileSync(path.join(root, 'about/index.html'), 'utf8');
+  for (const html of [home, about]) {
+    const person = schemaEntities(html).find((entity) => entity['@type'] === 'Person');
+    assert.equal(person?.name, 'Adrian-Leontin Rusu');
+    assert.equal(person?.alternateName, 'Adrian Rusu');
+    assert.deepEqual(person?.sameAs, [
+      'https://www.linkedin.com/in/adrian-leontin-rusu/',
+      'https://github.com/adrianrusu16',
+    ]);
+  }
+  const profile = schemaEntities(about).find((entity) => entity['@type'] === 'ProfilePage');
+  assert.equal(profile?.url, 'https://adrianrusu.dev/about/');
+  assert.equal(profile?.mainEntity?.['@id'], 'https://adrianrusu.dev/#person');
+  assert.ok(/rel="canonical" href="https:\/\/adrianrusu.dev\/about\/"/.test(about));
+  const caption = about.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/)?.[1];
+  assert.ok(caption?.trim().startsWith('Adrian-Leontin Rusu'));
+  assert.ok(/<title>Adrian-Leontin Rusu — Senior Android \/ AAOS Engineer<\/title>/.test(about));
+  assert.ok(/<title>Adrian Rusu — Android Automotive Engineer<\/title>/.test(home));
+});
+
 test('production experience identifies the employer and keeps client work generic', () => {
   const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const card = home.match(/<div class="experience-preview">([\s\S]*?)<\/section>/)?.[1];

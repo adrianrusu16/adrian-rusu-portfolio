@@ -1,5 +1,7 @@
 export const identity = {
   site: 'https://adrianrusu.dev',
+  name: 'Adrian-Leontin Rusu',
+  displayName: 'Adrian Rusu',
   email: 'hello@adrianrusu.dev',
   linkedIn: 'https://www.linkedin.com/in/adrian-leontin-rusu/',
   github: 'https://github.com/adrianrusu16',
