@@ -174,7 +174,7 @@ Case-study claims are intentionally grounded in public source where possible.
 - API-contract evidence → [`canopy-api`](https://github.com/adrianrusu16/canopy-api)
 - C++ learning-lab evidence → [`cpp-mastery`](https://github.com/adrianrusu16/cpp-mastery)
 
-Commercial SiriusXM/AscentCore work is described only through responsibilities, tools and areas of practice. No proprietary screenshots, code, traces or internal architecture are included.
+Commercial client work performed through AscentCore is described only through responsibilities, tools and areas of practice. Client identities, proprietary screenshots, code, traces and internal architecture are not disclosed.
 
 The portrait is an identity-preserving edit of a supplied photograph. PandaWave UI images are real project captures. Architecture graphics are explanatory figures, not measured benchmark output.
 
