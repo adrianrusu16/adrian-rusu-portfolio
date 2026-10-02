@@ -18,6 +18,12 @@ const pages = [
   '404.html',
 ];
 
+test('the public build excludes editor lock files', () => {
+  const files = fs.readdirSync(root, { recursive: true });
+  const editorFiles = files.filter((file) => path.basename(file).startsWith('~$'));
+  assert.deepEqual(editorFiles, []);
+});
+
 function schemaEntities(html) {
   return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(
     ([, json]) => {
