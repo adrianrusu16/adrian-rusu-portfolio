@@ -27,6 +27,36 @@ function schemaEntities(html) {
   );
 }
 
+test('production experience identifies the employer and keeps client work generic', () => {
+  const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const card = home.match(/<div class="experience-preview">([\s\S]*?)<\/section>/)?.[1];
+  assert.ok(card);
+  const employer = card.match(/<span class="eyebrow">([^<]+)<\/span>/)?.[1];
+  assert.equal(employer, 'ASCENTCORE');
+  assert.match(card, /Automotive media HMI/);
+  for (const theme of ['Media', 'Automotive', 'Performance', 'Feature ownership'])
+    assert.ok(card.includes(theme));
+
+  const experience = fs.readFileSync(path.join(root, 'experience/index.html'), 'utf8');
+  const currentRole = experience.match(/<article class="career-entry">([\s\S]*?)<\/article>/)?.[1];
+  assert.ok(currentRole);
+  assert.match(currentRole, /<span class="company-label">AscentCore<\/span>/);
+  assert.match(currentRole, /Production automotive media HMI/);
+  assert.doesNotMatch(currentRole, /Client\s*:/i);
+  const description = experience.match(/name="description" content="([^"]+)"/)?.[1];
+  assert.equal(
+    description,
+    'Production Android Automotive media experience at AscentCore, preceded by Android development at Endava.',
+  );
+  for (const theme of ['MediaSession', 'Steering-wheel controls', 'Perfetto', 'Feature ownership'])
+    assert.ok(currentRole.includes(theme));
+
+  const resume = fs.readFileSync(path.join(root, 'resume/index.html'), 'utf8');
+  const heading = resume.match(/<h2>Current role<\/h2>[\s\S]*?<h3>([^<]+)<\/h3>/)?.[1];
+  assert.equal(heading, 'AscentCore');
+  assert.match(resume, /Aug 2023 — Present · Senior Android Developer/);
+});
+
 test('indexable pages connect their canonical URL, identity and page schema', () => {
   const descriptions = new Set();
   for (const page of pages.filter((p) => p !== '404.html')) {

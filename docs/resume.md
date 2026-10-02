@@ -1,39 +1,50 @@
 # Canonical résumé
 
-Last updated: 30 September 2026. Primary public email: `hello@adrianrusu.dev`.
+Last validated: 2 October 2026. Primary public email: `hello@adrianrusu.dev`.
 
 The canonical public export is `public/adrian-rusu-resume.pdf`, served at `/adrian-rusu-resume.pdf`. Open, Download and footer links consume `identity.resume`; the `resume_pdf_click` event and consent behavior are unchanged.
 
-## Source and export workflow
+## Editable source and export workflow
 
-This update uses the owner's supplied `Adrian_Rusu_Android_AAOS_CV_2026_Final_Hello.pdf` unchanged. It supersedes the older filename referenced in the implementation plan. Its metadata identifies LibreOffice Writer 25.2.3.2 as the exporter. No PDF internals were edited, no content was recreated, and no pages were flattened.
+The original Word/Writer source was not recovered. On 2 October 2026, the owner explicitly authorized creating a new editable source from the previously approved PDF for the client-name redaction. The new source is `Adrian_Rusu_Android_AAOS_CV_2026_Redacted.docx`, maintained in the owner's private résumé workspace. Its working copy is excluded from Git. It is a newly established source, not a recovered original.
 
-The canonical source for this release is `public/adrian-rusu-resume.pdf`. The editable Word/Writer source is unavailable / not recovered. On 30 September 2026, the owner accepted this as a maintenance limitation and explicitly removed editable-source recovery as a publication requirement. Preserve the canonical PDF unchanged; do not reconstruct or reverse-engineer an editable source from it. Keep private local paths out of committed documentation.
+The source retains the original Noto Serif family, blue/gray palette, section order and two-page structure. Only the five planned client-identifying passages were rewritten; other normalized extracted content is equivalent. Reconstruction and the change of exporter introduce differences in spacing and line wrapping. Both rendered pages were inspected for clipping, overlap and missing glyphs.
 
-Future edits must either locate the original authoring source or establish a new reproducible source workflow. This release does not authorize rebuilding the résumé. For an approved future update, export once as a two-page text PDF with hyperlinks preserved. Validate the export, then copy those exact bytes to `public/adrian-rusu-resume.pdf`. The recruiter copy may be named `Adrian_Rusu_Android_AAOS_CV_2026.pdf`; make it a copy of the same export, never a separately edited document.
+LibreOffice was unavailable on the implementation host. The new DOCX was exported with Microsoft Word 2016, with Noto Serif fonts embedded, selectable text and hyperlinks preserved. No PDF internals were patched and no pages were rasterized. Future edits should use this editable source and the following controlled workflow:
 
-## Release checklist
+1. Open the private DOCX in Word with its embedded Noto Serif fonts available.
+2. Apply the approved content changes and retain the two-page structure.
+3. Export one validated PDF with document properties, hyperlinks and selectable text. Avoid bitmap text for missing fonts.
+4. Inspect both rendered pages, extracted text, metadata and the four contact annotations. Check client anonymity locally; do not commit restricted terms in regression tests or fixtures.
+5. Copy the validated export's exact bytes to `public/adrian-rusu-resume.pdf` and the recruiter attachment `Adrian_Rusu_Android_AAOS_CV_2026.pdf`. Never maintain independently edited PDFs.
+6. Update the validated fingerprint only after these checks pass, then run the project checks and résumé browser regressions.
 
-- [x] Canonical source for this release: `public/adrian-rusu-resume.pdf`.
-- [x] Editable source: unavailable / not recovered; owner accepts the maintenance limitation.
-- [x] Canonical PDF retained unchanged with two pages, selectable text, `hello@adrianrusu.dev` and its clickable email link.
-- [x] Stable `/adrian-rusu-resume.pdf` path, résumé analytics behavior and byte-identical recruiter copy retained.
-- [x] Site version 12 saved as an unpublished candidate from main `38989ec1275c8e21212d88f3e599ae62d4632e5b`.
-- [ ] Final owner approval of the release preview before publication.
-
-Editable-source recovery is not a publication blocker. Keep Site version 12 unpublished until final preview approval. This documentation update does not replace or publish that candidate. If documentation changes are later merged, reconcile the release candidate with the final main revision before publication; version 12 retains the source revision recorded above.
+Keep private absolute filesystem paths out of committed documentation. The original source's absence is an accepted historical maintenance limitation, not a publication requirement. The authorized new DOCX provides the workflow for future updates.
 
 ## Validated export
 
-- SHA-256: `e33e124e13173610619bd996e1a92b9c22b61cff0250572a24dc2f9218e9d17b`; 95,207 bytes; two pages.
-- Visible email and annotation: `hello@adrianrusu.dev` and `mailto:hello@adrianrusu.dev`. Previous email and convenience aliases are absent from extracted text, link targets and metadata.
-- Portfolio, LinkedIn and GitHub link targets are retained. These are PDF annotation checks, not claims about external-service availability.
-- Selectable text, headings, bullets and URLs remain; both pages render cleanly without clipped text or missing glyphs.
-- Extracted content differs from the old website PDF only in the email address. Experience, projects, toolbox, systems learning, education, training and languages are unchanged. Rendered page 2 is pixel-identical; page 1 differs only within the email's header rectangle at the same rendering scale.
-- Metadata retains the owner's name, Android/AAOS title and Writer exporter information; no private filesystem paths or internal comments were found. The supplied metadata was preserved instead of rewriting the PDF.
+- SHA-256: `490c95618f74bd9648a46531548a8b4ec945c18c50297ffd56bf3bb0beb6115f`; 408,642 bytes; two pages.
+- Visible email and annotation: `hello@adrianrusu.dev` and `mailto:hello@adrianrusu.dev`. Previous email and convenience aliases are absent from extracted text and link targets.
+- Portfolio, LinkedIn and GitHub annotation targets remain. These checks do not establish external-service availability.
+- Client identity and acronym are absent from extracted text, metadata and annotations. The employer remains AscentCore; production AAOS media, automotive interaction, performance and delivery responsibilities remain intact.
+- Selectable text, headings, bullets and URLs remain. No raster text or private filesystem metadata was found.
+- Recruiter and website copies are byte-identical. Static tests also require the generated website asset to match.
+
+## Release checklist
+
+- [x] Canonical public artifact and stable URL retained.
+- [x] Owner authorized the newly established private DOCX source workflow.
+- [x] Two-page visual, text, link, metadata and client-name checks completed.
+- [x] Recruiter copy matches the canonical PDF.
+- [x] Owner chose corrections to current materials only; historical commits and PRs remain intact and can still expose older materials.
+- [ ] Build, static/browser checks and CI pass for the redaction release.
+- [ ] Exact merged main prepared and previewed in the existing Site before publication.
+- [ ] Production homepage, Experience, Résumé and opened/downloaded PDF pass the post-publication smoke test.
+
+Version 12 is the prior published release. Release the client-name redaction from a new candidate built from exact merged main.
 
 ## Regression checks
 
-The static résumé test pins the SHA-256 of this manually validated export and confirms the built file is identical. Before changing that fingerprint for any future export, repeat the two-page visual, extracted-text and annotation checks, including the absence of old or private contact addresses. Preserve the important sections and technical terms; do not add keywords merely to satisfy a check.
+The résumé test pins the SHA-256 of this manually validated export and confirms the generated file is identical. Before changing the fingerprint for any future export, repeat the two-page visual, extracted-text and annotation checks. Preserve the technical sections; do not add keywords merely to satisfy a check.
 
-Browser coverage opens the PDF and downloads it, compares both with the canonical file, and retains the existing consent-aware `resume_pdf_click` tests. Run frozen installation, check, lint, formatting, build, static tests and browser tests before delivery. Verify exact merged main and save a new unpublished Site candidate; publication still requires owner approval.
+Browser coverage opens and downloads the PDF, compares both with the canonical asset, and retains consent-aware `resume_pdf_click` tests. Run frozen installation, check, lint, formatting, build, static tests and browser tests before delivery.
