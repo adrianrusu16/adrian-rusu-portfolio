@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { getPublishedNotes } from '../../lib/notes';
+import '../../styles/notes.css';
+const notes = await getPublishedNotes();
+---
+
+<BaseLayout
+  title="Engineering Notes — Adrian Rusu"
+  description="Practical write-ups on Android Automotive focus, Android performance and media integration, grounded in PandaWave’s public code."
+  pageType="CollectionPage"
+>
+  <section class="page-intro">
+    <div class="container">
+      <span class="eyebrow">ENGINEERING NOTES</span>
+      <h1>Following the evidence<span class="title-dot">.</span></h1>
+      <p class="intro-description">
+        Practical write-ups on AAOS, Android media, performance and systems boundaries.
+      </p>
+    </div>
+  </section>
+  <section class="container notes-list" aria-label="Published engineering notes">
+    {notes.map((note) => <NoteCard note={note} />)}
+  </section>
+</BaseLayout>

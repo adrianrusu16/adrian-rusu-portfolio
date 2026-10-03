@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentLink from '../../components/ContentLink.astro';
+import { identity } from '../../data/identity';
+import { getPublishedNotes, noteDate } from '../../lib/notes';
+import { noteSchema } from '../../lib/seo';
+import '../../styles/notes.css';
+export async function getStaticPaths() {
+  return (await getPublishedNotes()).map((note) => ({
+    params: { slug: note.id },
+    props: { note },
+  }));
+}
+const { note } = Astro.props;
+const { Content, headings } = await render(note);
+const projects = await getCollection('projects');
+const related = note.data.relatedProjects.map((id: string) => {
+  const project = projects.find((entry) => entry.id === id);
+  if (!project) throw new Error(`Unknown related project ${id} in note ${note.id}`);
+  return project;
+});
+---
+
+<BaseLayout
+  title={note.data.seoTitle}
+  description={note.data.seoDescription}
+  socialImage={note.data.socialImage}
+  mainEntity={new URL(`/notes/${note.id}/#article`, Astro.site).href}
+  schema={noteSchema(note, Astro.site!)}
+>
+  <article>
+    <header class="page-intro note-intro container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span><a href="/notes/">Notes</a>
+        <span aria-hidden="true">/</span><span aria-current="page">{note.data.title}</span>
+      </nav>
+      <span class="eyebrow">ENGINEERING NOTE</span>
+      <h1>{note.data.title}</h1>
+      <p class="intro-description">{note.data.summary}</p>
+      <div class="note-byline">
+        <a href="/about/">{identity.name}</a>
+        <span
+          >Published <time datetime={note.data.published.toISOString()}
+            >{noteDate(note.data.published)}</time
+          ></span
+        >
+        {
+          note.data.updated && (
+            <span>
+              Updated{' '}
+              <time datetime={note.data.updated.toISOString()}>{noteDate(note.data.updated)}</time>
+            </span>
+          )
+        }
+      </div>
+      <div class="tags">{note.data.tags.map((tag: string) => <span>{tag}</span>)}</div>
+    </header>
+    <div class="container note-layout">
+      <nav class="note-toc" aria-label="In this note">
+        <span class="eyebrow">IN THIS NOTE</span>
+        <ul>
+          {
+            headings
+              .filter((heading) => heading.depth === 2)
+              .map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))
+          }
+        </ul>
+      </nav>
+      <div class="note-body">
+        <div class="prose"><Content components={{ a: ContentLink }} /></div>
+        {
+          related.length > 0 && (
+            <nav class="note-projects" aria-label="Related projects">
+              <span class="eyebrow">PUBLIC PROJECT EVIDENCE</span>
+              {related.map((project) => (
+                <a href={`/projects/${project.id}/`}>{project.data.title} case study →</a>
+              ))}
+            </nav>
+          )
+        }
+        <a class="text-link" href="/notes/">← All engineering notes</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

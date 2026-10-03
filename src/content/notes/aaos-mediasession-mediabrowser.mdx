@@ -1,0 +1,66 @@
+---
+title: MediaSession and MediaBrowser in an Android Automotive media app
+summary: Trace a browser request through PandaWave’s Media3 service and keep Android browse IDs separate from the domain catalog contract.
+published: 2026-10-03
+tags: [AAOS, Media3, MediaSession]
+seoTitle: MediaSession and MediaBrowser in AAOS — Adrian Rusu
+seoDescription: How PandaWave’s public Media3 adapter handles browser connections, browse roots and catalog IDs at the Android-to-domain boundary.
+socialImage: /images/og-note-aaos-mediasession-mediabrowser.png
+relatedProjects: [pandawave, canopy-api]
+---
+
+A media app can play inside its own UI while presenting an empty library to another browser. Playback state, connection authorization and the browse tree are different contracts. Debugging only the player leaves several ways for integration to fail.
+
+PandaWave exposes those contracts through an Android Media3 adapter. Android owns the player and session objects; repositories and the engine supply catalog and domain decisions. This note follows that public implementation and one useful failure mode: allowing a platform browse ID to fall through into a backend request.
+
+## Name the API generation first
+
+The public [BambooMediaLibraryService](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/media-adapter/src/main/kotlin/com/adrianrusu/pandawave/core/media/adapter/playback/BambooMediaLibraryService.kt) extends Media3's `MediaLibraryService`, rather than the older `MediaBrowserServiceCompat`. It creates a `MediaLibrarySession`, a player adapter, a playback bridge and a catalog callback.
+
+That matters when reading examples. Media3 browser operations use futures and library results; older examples use a different callback model. The [Media3 service guide](https://developer.android.com/media/media3/session/serve-content) describes the modern service and manifest configuration. Compatibility with older clients requires the relevant service declarations; extending a class alone is not the entire integration.
+
+A Media3 `MediaBrowser` is a controller with library-browsing capabilities. Keep browsing and transport commands distinct when investigating what the client can do. The [client connection guide](https://developer.android.com/media/media3/session/connect-to-media-app) covers the connection and package visibility requirements for cross-app access.
+
+## Debug the connection before the catalog
+
+The service's `onGetSession` obtains its session through `ensureSession`. The [session callback](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/media-adapter/src/main/kotlin/com/adrianrusu/pandawave/core/media/adapter/playback/BambooMediaLibrarySessionCallback.kt) evaluates the controller in `onConnect`. A rejected connection cannot be repaired by adding a missing browse item.
+
+Trace the integration in this order:
+
+1. Does the client find and bind the expected service?
+2. Does the service return a session, and does controller policy accept this client?
+3. Does `onGetLibraryRoot` return the intended root for its hints?
+4. Do `onGetChildren` requests return the expected page of children?
+5. Can an item be resolved and converted into the requested playback action?
+6. Does the session report the resulting player state and available commands?
+
+PandaWave calculates available commands from controller policy and current capabilities. Do not hard-code a broad set merely to make a test client happy; determine which capability or policy decision excluded the operation.
+
+## Keep platform IDs out of the domain catalog
+
+[PandaMediaLibraryIds](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/media-adapter/src/main/kotlin/com/adrianrusu/pandawave/core/media/adapter/playback/PandaMediaLibraryIds.kt) defines nodes such as `pw.root`, `pw.library`, `pw.saved` and `pw.history`. Some are synthetic folders assembled for Android browsing. Their names are not automatically valid catalog parent IDs in Canopy.
+
+The mapping is deliberately narrow. The root, albums and artists have engine parent mappings; saved and history do not. These illustrative assertions summarize cases in the public [media library contract tests](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/media-adapter/src/test/kotlin/com/adrianrusu/pandawave/core/media/adapter/playback/PandaMediaLibraryContractTest.kt):
+
+```kotlin
+assertEquals("root", PandaMediaLibraryIds.engineParentId("pw.root"))
+assertEquals("albums", PandaMediaLibraryIds.engineParentId("pw.albums"))
+assertNull(PandaMediaLibraryIds.engineParentId("pw.saved"))
+assertNull(PandaMediaLibraryIds.engineParentId("pw.history"))
+```
+
+If a saved-items folder is empty, inspect its adapter branch before changing the backend. A fallback that sends every unknown `pw.*` string to the catalog erases this contract. It can produce a valid request with no meaningful parent behind it, making the browser look broken even though connection and playback work.
+
+## Observe the asynchronous browse boundary
+
+The callback returns the root directly and uses its asynchronous catalog path for item and children requests. Children requests carry the parent, page, page size and hints. Record those inputs with the result category during a development investigation; avoid dumping account data or authenticated payloads.
+
+Compare the same parent and pagination values across two clients before blaming rendering. Check whether a catalog generation change notifies the platform folder a browser actually subscribed to. A correct initial result followed by a stale UI can be a notification problem rather than a query problem.
+
+The contract tests also cover occurrence IDs distinguishing the same track at different queue positions and mappings from engine errors into Media3 errors. Collapsing occurrence IDs can change which queue entry a controller selects; collapsing errors makes diagnosis harder.
+
+## What to validate on an AAOS target
+
+Public unit tests describe adapter behavior; they do not prove integration with every automotive host. Validate discovery, authorization, browse hints, pagination, subscriptions, playback commands and reported state with the intended browser on the intended system image. Keep the API version and manifest behavior in the test record.
+
+The [PandaWave case study](/projects/pandawave/) explains the player and domain split. The [canopy-api case study](/projects/canopy-api/) describes the separate backend contract. Keeping those boundaries explicit makes an empty browser screen a set of testable questions.

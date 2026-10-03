@@ -1,0 +1,72 @@
+---
+title: Diagnosing Android UI jank with Perfetto and ATrace
+summary: Connect missed frames to named work in PandaWave’s Android adapter, while keeping startup measurements and emulator results in context.
+published: 2026-10-03
+tags: [Android performance, Perfetto, ATrace]
+seoTitle: Diagnosing Android UI Jank with Perfetto and ATrace — Adrian Rusu
+seoDescription: A repeatable trace-reading workflow using PandaWave’s public instrumentation, frame timelines and a SQL query for long thread slices.
+socialImage: /images/og-note-android-jank-perfetto-atrace.png
+relatedProjects: [pandawave]
+---
+
+A long trace slice is a lead, not proof that it caused a missed frame. Work on a background thread may be harmless to rendering; a short operation can delay the UI if it blocks a dependency at the wrong time. The useful question is which work lies on the path to the late frame.
+
+PandaWave's public repository includes named Android trace sections, benchmark journeys and a Perfetto query. They provide a concrete investigation without publishing a proprietary trace. This note describes an experiment to run; it does not report a measured improvement or a benchmark result from that experiment.
+
+## Give the trace a repeatable journey
+
+Pick one action with an identifiable start and end: opening a media screen, connecting a browser or returning to playback. Capture the same journey before and after a candidate change. Keep the build variant, device, refresh rate, power conditions, renderer and animation settings consistent. Record whether the process starts cold or is already running.
+
+The project's [benchmark instructions](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/benchmark/README.md) separate controlled single-user benchmark runs from manual AAOS checks. They warn that headless-system-user AAOS images are unreliable targets for those Macrobenchmark journeys. An emulator comparison helps a controlled investigation; it is not a release-hardware performance claim.
+
+Save the raw trace and benchmark output immediately after a run, together with the commit and environment. A screenshot of a promising interval cannot replace the trace when a later comparison raises a different question.
+
+## Add names at boundaries you can explain
+
+[PandaTrace](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/common/src/main/kotlin/com/adrianrusu/pandawave/core/common/trace/PandaTrace.kt) wraps Android's `Trace` API. Its `section` helper begins a named section and ends it in `finally`, even if the wrapped work throws. Names are limited to 127 characters.
+
+For synchronous work, a call site can look like this illustrative example:
+
+```kotlin
+val models = PandaTrace.section("PW.Debug.mapBrowserItems") {
+    items.map { item -> item.toBrowserModel() }
+}
+```
+
+Keep a synchronous section on the same thread. Do not wrap a suspension or a callback that finishes on another thread and interpret it as an ordinary nested slice; use an appropriate asynchronous tracing API for that lifetime. Android's [custom tracing guidance](https://developer.android.com/topic/performance/tracing/custom-events) explains how application sections add context to a system trace.
+
+Existing [media-service instrumentation](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/media-adapter/src/main/kotlin/com/adrianrusu/pandawave/core/media/adapter/playback/BambooMediaLibraryService.kt) names service creation, session creation and session lookup. `PW.Media3.Service.ensureSession`, for example, identifies the Android session boundary. Its duration alone does not establish whether a visible frame missed its deadline.
+
+## Read the frame before selecting the culprit
+
+On supported Android 12+ captures, Perfetto's [FrameTimeline](https://perfetto.dev/docs/data-sources/frametimeline) pairs expected and actual frame timing. Start at the delayed presentation, identify the relevant app frame, then inspect threads and dependencies across that interval. Distinguish an app deadline miss from a SurfaceFlinger delay.
+
+Do not assume a universal 16 ms budget. Use the captured expected timeline and the device's display behavior. Examine scheduling: a main thread that is runnable but not running suggests a different problem from one sleeping on a lock or Binder reply. A named section crossing the interval becomes stronger evidence when the dependency and timing also line up.
+
+## Use SQL to find candidates, then inspect them
+
+The public [startup-hotspots query](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/benchmark/perfetto/startup-hotspots.sql) lists long slices on PandaWave process threads. This is the same query with an explanatory comment:
+
+```sql
+SELECT
+    p.name AS process,
+    t.name AS thread,
+    s.name AS slice,
+    ROUND(s.dur / 1000000.0, 2) AS duration_ms
+FROM slice AS s
+JOIN thread_track AS tt ON s.track_id = tt.id
+JOIN thread AS t USING (utid)
+JOIN process AS p USING (upid)
+WHERE p.name LIKE 'com.adrianrusu.pandawave%'
+  AND s.dur > 10000000 -- 10 ms candidate filter; not a frame deadline
+ORDER BY s.dur DESC
+LIMIT 60;
+```
+
+Run it in Perfetto's SQL view after opening the capture. The query selects thread slices, not every track, and ranks candidates across the capture. Narrow the timeline to the reproduced action before deciding which row matters. Startup work may dominate a cold-start trace while being irrelevant to a later scrolling problem.
+
+## Test the explanation, not just the patch
+
+Write a prediction before changing code: which section or wait should shrink, on which thread, during which action? Change one cause, recapture the same journey and compare multiple runs. Check both the named work and the frame outcome. Moving work away from the UI can improve one interval while introducing contention or a delayed media response elsewhere.
+
+Keep a change when the trace and visible behavior support the explanation. Where evidence is inconclusive, record that limitation instead of assigning a precise gain. The [PandaWave case study](/projects/pandawave/) gives the architectural context for the Android adapter.

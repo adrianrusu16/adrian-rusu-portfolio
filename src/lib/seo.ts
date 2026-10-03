@@ -117,6 +117,36 @@ export function projectSchema(project: CollectionEntry<'projects'>, site: URL): 
   ];
 }
 
+export function noteSchema(note: CollectionEntry<'notes'>, site: URL): SchemaEntity[] {
+  const { data, id } = note;
+  const url = new URL(`/notes/${id}/`, site).href;
+  return [
+    {
+      '@type': 'TechArticle',
+      '@id': `${url}#article`,
+      url,
+      headline: data.title,
+      description: data.seoDescription,
+      author: { '@id': new URL('/#person', site).href },
+      datePublished: data.published.toISOString(),
+      ...(data.updated ? { dateModified: data.updated.toISOString() } : {}),
+      image: new URL(data.socialImage, site).href,
+      keywords: data.tags,
+      inLanguage: 'en',
+      mainEntityOfPage: { '@id': `${url}#webpage` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${url}#breadcrumb`,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: site.href },
+        { '@type': 'ListItem', position: 2, name: 'Notes', item: new URL('/notes/', site).href },
+        { '@type': 'ListItem', position: 3, name: data.title, item: url },
+      ],
+    },
+  ];
+}
+
 // Escape HTML delimiters so content cannot terminate a JSON-LD script element.
 export function serializeSchema(value: unknown): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
