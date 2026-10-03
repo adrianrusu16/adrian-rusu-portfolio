@@ -2,6 +2,7 @@ dist
 node_modules
 .astro
 .sites-runtime
+.superpowers
 # Local assistant state is not part of the website source.
 .serena
 pnpm-lock.yaml

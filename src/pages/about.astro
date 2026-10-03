@@ -3,11 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import Portrait from '../components/Portrait.astro';
 import ContactStrip from '../components/ContactStrip.astro';
+import { identity } from '../data/identity';
 ---
 
 <BaseLayout
-  title="About Adrian Rusu — Android Automotive Engineer"
-  description="Meet Adrian Rusu, a Senior Android / AAOS Engineer working on automotive media, Android performance and hands-on systems projects in Rust and C++."
+  title={`${identity.name} — Senior Android / AAOS Engineer`}
+  description={`${identity.name} is a Senior Android / AAOS Engineer focused on Android Automotive media/HMI, performance, platform behavior and systems engineering.`}
   pageType="ProfilePage"
   mainEntity={new URL('/#person', Astro.site).href}
 >
@@ -21,7 +22,10 @@ import ContactStrip from '../components/ContactStrip.astro';
           what makes those experiences work.
         </p><ContactStrip />
       </div><figure class="portrait-frame">
-        <Portrait /><figcaption>Adrian Rusu <span>Senior Android / AAOS Engineer</span></figcaption>
+        <Portrait /><figcaption>
+          {identity.name}
+          <span>Senior Android / AAOS Engineer</span>
+        </figcaption>
       </figure>
     </div>
   </section>
