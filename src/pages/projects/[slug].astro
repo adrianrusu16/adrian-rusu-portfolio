@@ -7,6 +7,8 @@ import Lightbox from '../../components/Lightbox.astro';
 import ContentLink from '../../components/ContentLink.astro';
 import { getCollection, render } from 'astro:content';
 import { projectSchema } from '../../lib/seo';
+import { getPublishedNotes } from '../../lib/notes';
+import '../../styles/notes.css';
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
   return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
@@ -14,6 +16,9 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content, headings } = await render(project);
 const all = await getCollection('projects');
+const relatedNotes = (await getPublishedNotes()).filter((note) =>
+  note.data.relatedProjects.includes(project.id),
+);
 const related = project.data.related
   .map((id: string) => all.find((p) => p.id === id))
   .filter(Boolean);
@@ -94,6 +99,16 @@ const firstAnchor =
       <p class="case-lead">{project.data.intro}</p><div class="prose">
         <Content components={{ a: ContentLink }} />
       </div>
+      {
+        relatedNotes.length > 0 && (
+          <nav class="note-projects" aria-label="Related engineering notes">
+            <span class="eyebrow">ENGINEERING NOTES FROM THIS PROJECT</span>
+            {relatedNotes.map((note) => (
+              <a href={`/notes/${note.id}/`}>{note.data.title} →</a>
+            ))}
+          </nav>
+        )
+      }
       <nav class="related-projects" aria-label="Related projects">
         <span class="eyebrow">CONTINUE EXPLORING</span><div>
           {

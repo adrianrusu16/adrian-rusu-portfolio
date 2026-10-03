@@ -59,3 +59,49 @@ test('a narrow note keeps long code within its scroll container', async ({ page 
   for (const block of await page.locator('pre').all())
     await expect(block).toHaveCSS('overflow-x', 'auto');
 });
+
+test('Notes can be reached through desktop and mobile navigation', async ({ page }) => {
+  await page.goto('/');
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Notes', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/notes\/$/);
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Main navigation' })
+      .getByRole('link', { name: 'Notes', exact: true }),
+  ).toHaveAttribute('aria-current', 'page');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  const mobile = page.getByRole('navigation', { name: 'Mobile navigation' });
+  await expect(mobile).toBeVisible();
+  await mobile.getByRole('link', { name: 'Notes', exact: true }).click();
+  await expect(page).toHaveURL(/\/notes\/$/);
+  await expect(mobile).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+});
+
+for (const width of [820, 1024]) {
+  test(`the expanded primary navigation does not overlap header actions at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/notes/');
+    const navigation = page.getByRole('navigation', { name: 'Main navigation' });
+    if (await navigation.isVisible()) {
+      const nav = await navigation.boundingBox();
+      const actions = await page.locator('.header-actions').boundingBox();
+      expect(nav.x + nav.width).toBeLessThanOrEqual(actions.x);
+    } else
+      await expect(
+        page.getByRole('button', { name: 'Open navigation', exact: true }),
+      ).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+  });
+}

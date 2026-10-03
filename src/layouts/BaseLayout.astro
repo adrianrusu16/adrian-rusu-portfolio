@@ -6,6 +6,7 @@ import AnalyticsConsent from '../components/AnalyticsConsent.astro';
 import CloudflareAnalytics from '../components/CloudflareAnalytics.astro';
 import ContactStrip from '../components/ContactStrip.astro';
 import { identity } from '../data/identity';
+import { getPublishedNotes } from '../lib/notes';
 import { pageSchema, serializeSchema, type PageType, type SchemaEntity } from '../lib/seo';
 interface Props {
   title?: string;
@@ -29,6 +30,7 @@ const path = Astro.url.pathname;
 const links = [
   ['Home', '/'],
   ['Projects', '/projects/'],
+  ...((await getPublishedNotes()).length >= 3 ? [['Notes', '/notes/']] : []),
   ['Experience', '/experience/'],
   ['About', '/about/'],
 ];
