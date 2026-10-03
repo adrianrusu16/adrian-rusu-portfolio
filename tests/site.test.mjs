@@ -15,6 +15,10 @@ const pages = [
   'about/index.html',
   'resume/index.html',
   'privacy/index.html',
+  'notes/index.html',
+  'notes/aaos-rotary-dpad-focus/index.html',
+  'notes/android-jank-perfetto-atrace/index.html',
+  'notes/aaos-mediasession-mediabrowser/index.html',
   '404.html',
 ];
 

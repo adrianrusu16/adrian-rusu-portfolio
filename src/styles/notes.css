@@ -1,0 +1,136 @@
+.notes-list {
+  padding-block: 12px 96px;
+}
+.note-card {
+  border-top: 1px solid var(--border);
+  padding-block: 30px;
+}
+.note-card time,
+.note-byline {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.note-card h3 {
+  margin-block: 12px;
+  font-size: 1.6rem;
+  max-width: 850px;
+}
+.note-card h3 a:hover {
+  color: var(--accent-light);
+}
+.note-card p {
+  max-width: 800px;
+}
+.note-card .tags {
+  margin-top: 20px;
+}
+.note-intro h1 {
+  font-size: clamp(2.4rem, 4.5vw, 4.5rem);
+  max-width: 1100px;
+}
+.note-intro .breadcrumb {
+  flex-wrap: wrap;
+}
+.note-intro .breadcrumb span:last-child {
+  max-width: 600px;
+}
+.note-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-top: 24px;
+}
+.note-byline a {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.note-intro .tags {
+  margin-top: 20px;
+}
+.note-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 800px);
+  gap: 64px;
+  padding-block: 16px 96px;
+}
+.note-toc {
+  align-self: start;
+  position: sticky;
+  top: 32px;
+  font-size: 0.85rem;
+}
+.note-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+.note-toc li {
+  margin-block: 12px;
+}
+.note-toc a {
+  color: var(--muted);
+}
+.note-toc a:hover {
+  color: var(--text);
+}
+.note-body {
+  min-width: 0;
+}
+.note-body .prose > :first-child {
+  margin-top: 0;
+}
+.note-body .prose {
+  overflow-wrap: anywhere;
+}
+.note-body .prose pre {
+  overflow-wrap: normal;
+}
+.note-projects {
+  display: grid;
+  gap: 14px;
+  padding-block: 28px;
+  margin-block: 40px 24px;
+  border-block: 1px solid var(--border);
+}
+.note-projects a {
+  color: var(--accent-light);
+}
+.notes-teaser {
+  border-top: 1px solid var(--border);
+}
+.notes-teaser .note-card:last-child {
+  padding-bottom: 0;
+}
+@media (max-width: 1100px) {
+  .note-layout {
+    gap: 32px;
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+}
+@media (max-width: 780px) {
+  .notes-list {
+    padding-bottom: 60px;
+  }
+  .note-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding-bottom: 60px;
+  }
+  .note-toc {
+    position: static;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .note-toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+  .note-toc li {
+    margin: 0;
+  }
+  .note-card h3 {
+    font-size: 1.4rem;
+  }
+}

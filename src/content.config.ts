@@ -22,4 +22,24 @@ const projects = defineCollection({
     related: z.array(z.string()),
   }),
 });
-export const collections = { projects };
+const notes = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/notes' }),
+  schema: z
+    .object({
+      title: z.string().min(1),
+      summary: z.string().min(1),
+      published: z.coerce.date(),
+      updated: z.coerce.date().optional(),
+      tags: z.array(z.string()).min(1),
+      seoTitle: z.string().min(1),
+      seoDescription: z.string().min(1),
+      socialImage: z.string().startsWith('/images/'),
+      relatedProjects: z.array(z.string()).default([]),
+      draft: z.boolean().default(false),
+    })
+    .refine((note) => !note.updated || note.updated >= note.published, {
+      message: 'An update cannot precede publication.',
+      path: ['updated'],
+    }),
+});
+export const collections = { projects, notes };

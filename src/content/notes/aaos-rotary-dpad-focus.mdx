@@ -1,0 +1,72 @@
+---
+title: Debugging rotary and DPAD focus navigation in Android Automotive
+summary: Separate input delivery from focus movement, then test the small-delta and direction-change behavior in PandaWave’s Compose rotary path.
+published: 2026-10-03
+tags: [AAOS, Compose, Rotary focus]
+seoTitle: Debugging AAOS Rotary and DPAD Focus — Adrian Rusu
+seoDescription: A source-backed debugging workflow for rotary input thresholds, direction changes and keyboard focus in an Android Automotive Compose UI.
+socialImage: /images/og-note-aaos-rotary-dpad-focus.png
+relatedProjects: [pandawave]
+---
+
+A rotary event can reach the UI without moving focus. Before changing the focus order, establish which part of the path failed: delivery, accumulation, focus movement or scrolling.
+
+PandaWave has a small, inspectable example of this boundary. Its Compose rotary column converts accumulated scroll pixels into forward or backward focus movement. This example is from the public personal project, not a commercial vehicle implementation or a claim about behavior on every AAOS device.
+
+## Start with two different navigation paths
+
+DPAD navigation asks the focus system to move in a direction. Rotary input needs a policy for turning scroll deltas into focus steps. Testing both is useful, but a keyboard test does not prove that a vehicle controller delivers the same events.
+
+AAOS also has a platform rotary model: rotation moves within a focus area and nudging moves between areas. The [AAOS rotary guidance](https://source.android.com/docs/automotive/hmi/rotary_controller) describes that behavior. A Compose `focusGroup()` in the example here is not an implementation of the platform's car-ui `FocusArea` or its nudge behavior. Keep those layers separate when interpreting a result.
+
+First use a keyboard to establish whether the intended controls can receive focus and whether traversal is sensible. Then test rotary delivery on the target AAOS environment. Record the focused control before and after each action. Distinguish the first action after touch from later rotary actions: entering rotary mode can itself affect what the user observes.
+
+## Inspect the conversion before the focus graph
+
+The public [RotaryFocusStepAccumulator](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/ui/src/main/kotlin/com/adrianrusu/pandawave/core/ui/focus/RotaryFocusStepAccumulator.kt) keeps a partial delta until it reaches a positive threshold. It resets the partial amount on a direction change, ignores zero and non-finite input, and emits at most one step per event.
+
+These assertions adapt the repository's [accumulator tests](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/ui/src/test/kotlin/com/adrianrusu/pandawave/core/ui/focus/RotaryFocusStepAccumulatorTest.kt):
+
+```kotlin
+val forward = RotaryFocusStepAccumulator(thresholdPixels = 20f)
+assertNull(forward.add(8f))
+assertEquals(RotaryFocusStep.Next, forward.add(12f))
+
+val reverse = RotaryFocusStepAccumulator(thresholdPixels = 20f)
+assertNull(reverse.add(15f))
+assertNull(reverse.add(-10f)) // discard the previous direction's partial delta
+assertEquals(RotaryFocusStep.Previous, reverse.add(-10f))
+
+val pause = RotaryFocusStepAccumulator(thresholdPixels = 20f)
+assertNull(pause.add(15f))
+assertNull(pause.add(0f))     // preserve the partial delta
+assertEquals(RotaryFocusStep.Next, pause.add(5f))
+```
+
+Twenty pixels is a test input, not a recommendation for all controllers. The implementation resets the accumulator after a step; it does not preserve a remainder or emit several steps for a large delta. A fast rotation and many small events can therefore behave differently. Decide whether that policy fits the interaction before treating it as a bug.
+
+## Follow the event into Compose
+
+In [BambooRotaryColumn](https://github.com/adrianrusu16/PandaWave/blob/bdf71eb9e570e98b3354a0c67a89c499e675d9b0/core/ui/src/main/kotlin/com/adrianrusu/pandawave/core/ui/focus/BambooRotaryColumn.kt), the handler passes `verticalScrollPixels` to the accumulator. A completed step calls `focusManager.moveFocus` with `Previous` or `Next`; an incomplete step returns `true` and consumes the event. The column also groups focus and can apply vertical scrolling.
+
+This gives three different observations to capture:
+
+- No handler invocation: investigate the focused receiver and input delivery.
+- Handler invoked, no step: inspect the delta, threshold and retained accumulator state.
+- Step emitted, focus unchanged: inspect the result of `moveFocus`, eligible targets and traversal boundaries.
+
+Log these in a development build alongside the current focus target. Avoid changing the threshold and focus graph together: doing so removes the evidence needed to tell which change helped.
+
+## Reproduce a boundary failure
+
+Use a list with enough controls to scroll. Begin with a known focused item, move forward to the last eligible control, reverse direction, then repeat after a recomposition and after switching from touch. Run the same sequence with DPAD keys and the actual rotary input path.
+
+If focus disappears after a screen update, inspect whether the focused item was removed or disabled and whether the remembered accumulator survived. If focus moves off-screen, investigate visibility and scrolling separately from accumulation. If only a large delta behaves unexpectedly, compare it against several smaller deltas with the same total.
+
+For View-based car-ui screens, the [app developer guidance](https://source.android.com/docs/automotive/hmi/rotary_controller/app_developers) covers `FocusArea` and forward traversal configuration. Apply that guidance at the platform layer rather than assuming this Compose adapter provides those semantics.
+
+## What the public tests establish
+
+The unit tests document deterministic threshold and reversal behavior. They do not establish controller feel, platform nudging, accessibility or safe in-vehicle interaction. Those need integration checks on the intended environment. The useful contract is narrow: given these deltas, the adapter should produce these steps.
+
+The broader Android and systems boundaries are described in the [PandaWave case study](/projects/pandawave/).
