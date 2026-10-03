@@ -10,12 +10,12 @@
   color: var(--muted);
   font-size: 0.85rem;
 }
-.note-card h3 {
+.note-card :is(h2, h3) {
   margin-block: 12px;
   font-size: 1.6rem;
   max-width: 850px;
 }
-.note-card h3 a:hover {
+.note-card :is(h2, h3) a:hover {
   color: var(--accent-light);
 }
 .note-card p {
@@ -130,7 +130,7 @@
   .note-toc li {
     margin: 0;
   }
-  .note-card h3 {
+  .note-card :is(h2, h3) {
     font-size: 1.4rem;
   }
 }

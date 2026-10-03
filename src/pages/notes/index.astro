@@ -21,6 +21,6 @@ const notes = await getPublishedNotes();
     </div>
   </section>
   <section class="container notes-list" aria-label="Published engineering notes">
-    {notes.map((note) => <NoteCard note={note} />)}
+    {notes.map((note) => <NoteCard note={note} headingLevel="h2" />)}
   </section>
 </BaseLayout>

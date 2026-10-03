@@ -4,8 +4,12 @@ import Icon from '../components/Icon.astro';
 import Portrait from '../components/Portrait.astro';
 import SourceLink from '../components/SourceLink.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { getPublishedNotes } from '../lib/notes';
+import '../styles/notes.css';
 import { getCollection } from 'astro:content';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const notes = (await getPublishedNotes()).slice(0, 3);
 ---
 
 <BaseLayout>
@@ -137,4 +141,25 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       </div>
     </div>
   </section>
+  {
+    notes.length >= 3 && (
+      <section class="section container notes-teaser" id="engineering-notes">
+        <div class="section-heading">
+          <div>
+            <>
+              <span class="eyebrow">04 / ENGINEERING NOTES</span>
+              <h2>Engineering notes</h2>
+            </>
+            <p>Practical write-ups on AAOS, Android media, performance and systems boundaries.</p>
+          </div>
+          <a href="/notes/" class="text-link">
+            All notes <Icon name="arrow" size={18} />
+          </a>
+        </div>
+        {notes.map((note) => (
+          <NoteCard note={note} />
+        ))}
+      </section>
+    )
+  }
 </BaseLayout>

@@ -23,6 +23,7 @@ const themes = [
   },
   {
     title: 'Performance',
+    note: '/notes/android-jank-perfetto-atrace/',
     items: [
       'Perfetto · ATrace · Android Profiler',
       'ANR investigation · LeakCanary',
@@ -79,6 +80,11 @@ const themes = [
                       <li>{item}</li>
                     ))}
                   </ul>
+                  {t.note && (
+                    <a class="text-link" href={t.note}>
+                      Perfetto workflow using public PandaWave code →
+                    </a>
+                  )}
                 </>
               </div>
             ))
